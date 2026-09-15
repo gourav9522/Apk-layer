@@ -10,6 +10,12 @@
     <meta id="metaDesc" property="og:description" content="Download trusted Android apps and games safely on ApkLayer.">
     <meta id="metaImage" property="og:image" content="https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg">
     
+    <!-- Twitter Card tags for better previews -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta id="twitterTitle" name="twitter:title" content="ApkLayer - Free Android App Store">
+    <meta id="twitterDesc" name="twitter:description" content="Download trusted Android apps and games safely on ApkLayer.">
+    <meta id="twitterImage" name="twitter:image" content="https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg">
+
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-white min-h-screen p-4">
@@ -31,10 +37,6 @@
                 <p class="text-xs text-slate-400">Trusted Global Android App Store</p>
             </div>
             <div class="flex items-center gap-2">
-                <!-- Share Store Button -->
-                <button onclick="shareStore()" class="px-3 py-1.5 bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-bold hover:bg-emerald-600 hover:text-white transition">
-                    📤 Share Store
-                </button>
                 <span id="adminBadge" class="hidden px-2.5 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-[10px] font-bold">Admin Unlocked</span>
             </div>
         </div>
@@ -152,27 +154,9 @@
             `).join('');
         }
 
-        function shareStore() {
-            const webUrl = "https://apk-layer.vercel.app/";
-            const storeTitle = "ApkLayer - Free Android App Store";
-            const storeDesc = "Download trusted Android apps and games safely on ApkLayer.";
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: storeTitle,
-                    text: storeDesc,
-                    url: webUrl
-                }).catch(() => {});
-            } else {
-                navigator.clipboard.writeText(webUrl);
-                alert(`Store Link Copied:\n${webUrl}`);
-            }
-        }
-
         function shareApp(appId, appName, event) {
-            if(event) event.stopPropagation(); // Prevent opening app view when clicking share button
-            let app = allApps.find(a => a.id == appId);
-            let webUrl = "https://apk-layer.vercel.app/#app=" + appId;
+            if(event) event.stopPropagation();
+            let webUrl = window.location.origin + window.location.pathname + "#app=" + appId;
             let shareText = `Download ${appName} on ApkLayer!`;
 
             if (navigator.share) {
@@ -224,27 +208,40 @@
         function renderDetail(appId) {
             let app = allApps.find(a => a.id == appId);
             if (!app) {
-                document.getElementById('pageTitle').innerText = "ApkLayer - Free Android App Store";
-                document.getElementById('metaTitle').content = "ApkLayer - Free Android App Store";
-                document.getElementById('metaDesc').content = "Download trusted Android apps and games safely on ApkLayer.";
-                document.getElementById('metaImage').content = "https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg";
-                
+                resetMetaTags();
                 document.getElementById('home-view').classList.remove('hidden');
                 document.getElementById('detail-view').classList.add('hidden');
                 displayApps(allApps);
                 return;
             }
 
-            // Update Meta Tags & Title dynamically for specific app preview
+            // Update Meta Tags dynamically so WhatsApp preview shows the specific app logo & title!
             document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
             document.getElementById('metaTitle').content = `${app.appName} - Download on ApkLayer`;
             document.getElementById('metaDesc').content = app.description || `Download ${app.appName} safely from ApkLayer.`;
-            document.getElementById('metaImage').content = app.logoUrl; // App ka khud ka logo preview me aayega!
+            document.getElementById('metaImage').content = app.logoUrl;
+
+            document.getElementById('twitterTitle').content = `${app.appName} - Download on ApkLayer`;
+            document.getElementById('twitterDesc').content = app.description || `Download ${app.appName} safely from ApkLayer.`;
+            document.getElementById('twitterImage').content = app.logoUrl;
 
             document.getElementById('home-view').classList.add('hidden');
             document.getElementById('detail-view').classList.remove('hidden');
 
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
+
+            // Render Screenshots HTML if available
+            let screenshotsHtml = '';
+            if (app.screenshots && Array.isArray(app.screenshots) && app.screenshots.length > 0) {
+                screenshotsHtml = `
+                    <div class="mb-6 w-full text-left">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">App Screenshots</h4>
+                        <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
+                            ${app.screenshots.map(sUrl => `<img src="${sUrl}" class="w-36 h-64 object-cover rounded-xl border border-slate-800 bg-slate-950 flex-shrink-0">`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
 
             document.getElementById('app-detail-content').innerHTML = `
                 <div class="flex flex-col items-center text-center">
@@ -257,6 +254,8 @@
                         <div><span class="text-slate-500 block">Version</span> <strong class="text-slate-200">${app.version || '1.0'}</strong></div>
                         <div><span class="text-slate-500 block">File Size</span> <strong class="text-slate-200">${app.size || 'N/A'}</strong></div>
                     </div>
+
+                    ${screenshotsHtml}
 
                     <button id="downloadBtn" onclick="startDownload('${app.archiveUrl}')" class="w-full py-3.5 bg-blue-600 hover:bg-blue-500 rounded-xl font-bold text-sm transition shadow-lg shadow-blue-600/30 text-center block">
                         Download APK
@@ -305,14 +304,20 @@
 
         function goBack() {
             window.location.hash = '';
+            resetMetaTags();
+            document.getElementById('detail-view').classList.add('hidden');
+            document.getElementById('home-view').classList.remove('hidden');
+            displayApps(allApps);
+        }
+
+        function resetMetaTags() {
             document.getElementById('pageTitle').innerText = "ApkLayer - Free Android App Store";
             document.getElementById('metaTitle').content = "ApkLayer - Free Android App Store";
             document.getElementById('metaDesc').content = "Download trusted Android apps and games safely on ApkLayer.";
             document.getElementById('metaImage').content = "https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg";
-            
-            document.getElementById('detail-view').classList.add('hidden');
-            document.getElementById('home-view').classList.remove('hidden');
-            displayApps(allApps);
+            document.getElementById('twitterTitle').content = "ApkLayer - Free Android App Store";
+            document.getElementById('twitterDesc').content = "Download trusted Android apps and games safely on ApkLayer.";
+            document.getElementById('twitterImage').content = "https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg";
         }
 
         function checkRoute() {
