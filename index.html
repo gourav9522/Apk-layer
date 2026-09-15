@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">ApkLayer - Free Android App Store</title>
-    <meta id="pageDesc" name="description" content="Download trusted Android apps and games safely on ApkLayer.">
+    
+    <!-- Dynamic Social Share Meta Tags -->
+    <meta id="metaTitle" property="og:title" content="ApkLayer - Free Android App Store">
+    <meta id="metaDesc" property="og:description" content="Download trusted Android apps and games safely on ApkLayer.">
+    <meta id="metaImage" property="og:image" content="https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg">
+    
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-white min-h-screen p-4">
@@ -25,7 +30,11 @@
                 <h1 class="text-3xl font-extrabold text-blue-500">ApkLayer</h1>
                 <p class="text-xs text-slate-400">Trusted Global Android App Store</p>
             </div>
-            <div>
+            <div class="flex items-center gap-2">
+                <!-- Share Store Button -->
+                <button onclick="shareStore()" class="px-3 py-1.5 bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-bold hover:bg-emerald-600 hover:text-white transition">
+                    📤 Share Store
+                </button>
                 <span id="adminBadge" class="hidden px-2.5 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-[10px] font-bold">Admin Unlocked</span>
             </div>
         </div>
@@ -110,7 +119,7 @@
             }
 
             displayApps(allApps);
-            checkRoute(); // Check hash on load
+            checkRoute();
         }
 
         function displayApps(apps) {
@@ -129,7 +138,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="shareApp('${app.id}', '${app.appName}')" class="px-3 py-2 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-xl text-xs font-bold border border-emerald-500/30 transition">
+                        <button onclick="shareApp('${app.id}', '${app.appName}', event)" class="px-3 py-2 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-xl text-xs font-bold border border-emerald-500/30 transition">
                             Share
                         </button>
                         ${isAdminUnlocked ? `
@@ -143,13 +152,33 @@
             `).join('');
         }
 
-        function shareApp(appId, appName) {
-            // Clean share link using main domain root
-            const webUrl = "https://apk-layer.vercel.app/#app=" + appId;
+        function shareStore() {
+            const webUrl = "https://apk-layer.vercel.app/";
+            const storeTitle = "ApkLayer - Free Android App Store";
+            const storeDesc = "Download trusted Android apps and games safely on ApkLayer.";
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: storeTitle,
+                    text: storeDesc,
+                    url: webUrl
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(webUrl);
+                alert(`Store Link Copied:\n${webUrl}`);
+            }
+        }
+
+        function shareApp(appId, appName, event) {
+            if(event) event.stopPropagation(); // Prevent opening app view when clicking share button
+            let app = allApps.find(a => a.id == appId);
+            let webUrl = "https://apk-layer.vercel.app/#app=" + appId;
+            let shareText = `Download ${appName} on ApkLayer!`;
+
             if (navigator.share) {
                 navigator.share({
                     title: appName,
-                    text: `Download ${appName} on ApkLayer!`,
+                    text: shareText,
                     url: webUrl
                 }).catch(() => {});
             } else {
@@ -196,15 +225,21 @@
             let app = allApps.find(a => a.id == appId);
             if (!app) {
                 document.getElementById('pageTitle').innerText = "ApkLayer - Free Android App Store";
+                document.getElementById('metaTitle').content = "ApkLayer - Free Android App Store";
+                document.getElementById('metaDesc').content = "Download trusted Android apps and games safely on ApkLayer.";
+                document.getElementById('metaImage').content = "https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg";
+                
                 document.getElementById('home-view').classList.remove('hidden');
                 document.getElementById('detail-view').classList.add('hidden');
                 displayApps(allApps);
                 return;
             }
 
-            // Update Page Title and Meta for SEO/Tab Name when viewing an app
+            // Update Meta Tags & Title dynamically for specific app preview
             document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
-            document.getElementById('pageDesc').content = app.description || `Download ${app.appName} safely from ApkLayer.`;
+            document.getElementById('metaTitle').content = `${app.appName} - Download on ApkLayer`;
+            document.getElementById('metaDesc').content = app.description || `Download ${app.appName} safely from ApkLayer.`;
+            document.getElementById('metaImage').content = app.logoUrl; // App ka khud ka logo preview me aayega!
 
             document.getElementById('home-view').classList.add('hidden');
             document.getElementById('detail-view').classList.remove('hidden');
@@ -271,6 +306,10 @@
         function goBack() {
             window.location.hash = '';
             document.getElementById('pageTitle').innerText = "ApkLayer - Free Android App Store";
+            document.getElementById('metaTitle').content = "ApkLayer - Free Android App Store";
+            document.getElementById('metaDesc').content = "Download trusted Android apps and games safely on ApkLayer.";
+            document.getElementById('metaImage').content = "https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg";
+            
             document.getElementById('detail-view').classList.add('hidden');
             document.getElementById('home-view').classList.remove('hidden');
             displayApps(allApps);
@@ -284,7 +323,6 @@
                     if (allApps.length > 0) {
                         renderDetail(match[1]);
                     } else {
-                        // Wait a second for apps to load if checkRoute runs before fetch completes
                         setTimeout(() => renderDetail(match[1]), 500);
                     }
                 }
