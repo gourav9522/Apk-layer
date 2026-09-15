@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApkLayer - Free Android App Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-white min-h-screen p-4">
+    <div class="max-w-3xl mx-auto py-6">
+        
+        <!-- Banner Image with Secret Click Trigger (Tap 5 times) -->
+        <div class="mb-2">
+            <img id="bannerImg" src="https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg" alt="Apk Layer Banner" class="w-full h-32 object-cover rounded-xl border border-slate-800 shadow-md cursor-pointer select-none">
+        </div>
+
+        <!-- Disclaimer Box -->
+        <div class="mb-6 p-3 bg-slate-900/80 border border-slate-800 rounded-xl text-[11px] text-slate-400 leading-relaxed">
+            <strong class="text-amber-400">Disclaimer:</strong> If any company, developer, or copyright holder has any issue with any app listed on this platform, please contact us directly at <span class="text-blue-400 font-mono">your-email@example.com</span> to request immediate removal, rather than issuing copyright strikes or takedowns to Internet Archive.
+        </div>
+
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-extrabold text-blue-500">ApkLayer</h1>
+                <p class="text-xs text-slate-400">Trusted Global Android App Store</p>
+            </div>
+            <div>
+                <span id="adminBadge" class="hidden px-2.5 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-[10px] font-bold">Admin Unlocked</span>
+            </div>
+        </div>
+
+        <!-- Main Store View -->
+        <div id="home-view">
+            <input type="text" id="search" placeholder="Search global apps by name..." onkeyup="filterApps()" 
+                class="w-full p-4 rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-blue-500 mb-6 text-sm">
+
+            <div id="loadingText" class="text-center py-10 text-slate-400 text-sm">Fetching apps from worldwide server...</div>
+            <div id="app-grid" class="grid grid-cols-1 gap-3">
+                <!-- Apps will load here -->
+            </div>
+        </div>
+
+        <!-- App Details / Download View -->
+        <div id="detail-view" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="goBack()" class="px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-2">
+                    ← Back to Store
+                </button>
+                <button id="shareDetailBtn" class="px-4 py-2 bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-bold hover:bg-emerald-600 hover:text-white transition">
+                    📤 Share App
+                </button>
+            </div>
+            <div id="app-detail-content" class="bg-slate-900 border border-slate-800 p-6 rounded-2xl mb-6"></div>
+
+            <!-- Related Apps Section -->
+            <div class="mt-8">
+                <h3 class="text-sm font-bold text-slate-400 mb-4 uppercase tracking-wider">Related Apps</h3>
+                <div id="related-apps-grid" class="grid grid-cols-1 gap-3">
+                    <!-- Related apps will load here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const FIREBASE_DB_URL = "https://apk-layer-default-rtdb.firebaseio.com/apps";
+        const APP_PACKAGE_NAME = "apklayer.aivf"; 
+
+        let allApps = [];
+        let isAdminUnlocked = false;
+        let bannerClicks = 0;
+        let clickTimer = null;
+
+        document.getElementById('bannerImg').addEventListener('click', () => {
+            bannerClicks++;
+            clearTimeout(clickTimer);
+            if (bannerClicks >= 5) {
+                bannerClicks = 0;
+                promptAdminPassword();
+            } else {
+                clickTimer = setTimeout(() => { bannerClicks = 0; }, 1000);
+            }
+        });
+
+        function promptAdminPassword() {
+            const pass = prompt("Enter Admin Password to manage/delete apps:");
+            if (pass === "9522") {
+                isAdminUnlocked = true;
+                document.getElementById('adminBadge').classList.remove('hidden');
+                alert("🔓 Admin mode unlocked! You can now delete apps.");
+                displayApps(allApps);
+            } else if (pass !== null) {
+                alert("❌ Wrong password!");
+            }
+        }
+
+        async function initStore() {
+            const loadingText = document.getElementById('loadingText');
+            try {
+                const res = await fetch(`${FIREBASE_DB_URL}.json`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data) {
+                        allApps = Object.entries(data).map(([key, val]) => ({ ...val, fbKey: key })).reverse();
+                    }
+                }
+            } catch(e) {
+                console.error("Error fetching global apps", e);
+            } finally {
+                if (loadingText) loadingText.style.display = 'none';
+            }
+
+            displayApps(allApps);
+            checkRoute();
+        }
+
+        function displayApps(apps) {
+            const grid = document.getElementById('app-grid');
+            if(apps.length === 0) {
+                grid.innerHTML = '<p class="text-slate-500 text-center py-10">No apps found globally. Upload via Console!</p>';
+                return;
+            }
+            grid.innerHTML = apps.map(app => `
+                <div class="flex items-center justify-between p-4 bg-slate-900 hover:bg-slate-900/80 rounded-2xl border border-slate-800/80 transition">
+                    <div onclick="openApp('${app.id}')" class="flex items-center gap-4 flex-1 cursor-pointer">
+                        <img src="${app.logoUrl}" alt="${app.appName}" class="w-14 h-14 rounded-2xl object-cover bg-slate-950 border border-slate-800">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-100">${app.appName}</h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Ver: ${app.version || '1.0'} • ${app.size || 'APK'}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="shareApp('${app.id}', '${app.appName}')" class="px-3 py-2 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-xl text-xs font-bold border border-emerald-500/30 transition">
+                            Share
+                        </button>
+                        ${isAdminUnlocked ? `
+                            <button onclick="deleteApp('${app.fbKey || app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
+                                Delete
+                            </button>
+                        ` : ''}
+                        <span onclick="openApp('${app.id}')" class="px-4 py-2 bg-blue-600/20 text-blue-400 rounded-xl text-xs font-bold border border-blue-500/30 cursor-pointer">View</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function shareApp(appId, appName) {
+            const webUrl = window.location.origin + window.location.pathname + `#app=${appId}`;
+            if (navigator.share) {
+                navigator.share({
+                    title: appName,
+                    text: `Check out ${appName} on ApkLayer!`,
+                    url: webUrl
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(webUrl);
+                alert(`Link copied for ${appName}:\n${webUrl}`);
+            }
+        }
+
+        async function deleteApp(fbKey, appName) {
+            const pass = prompt(`Confirm deletion for "${appName}"?\nEnter password (9522):`);
+            if (pass !== "9522") {
+                if (pass !== null) alert("❌ Incorrect password! Deletion cancelled.");
+                return;
+            }
+
+            try {
+                const res = await fetch(`${FIREBASE_DB_URL}/${fbKey}.json`, {
+                    method: 'DELETE'
+                });
+                if (res.ok) {
+                    alert(`✅ "${appName}" deleted successfully from server!`);
+                    allApps = allApps.filter(a => (a.fbKey || a.id) !== fbKey);
+                    displayApps(allApps);
+                } else {
+                    alert("❌ Failed to delete from server.");
+                }
+            } catch (err) {
+                alert("❌ Error: " + err.message);
+            }
+        }
+
+        function filterApps() {
+            let query = document.getElementById('search').value.toLowerCase();
+            let filtered = allApps.filter(app => app.appName.toLowerCase().includes(query));
+            displayApps(filtered);
+        }
+
+        function openApp(appId) {
+            window.location.hash = `app=${appId}`;
+            renderDetail(appId);
+        }
+
+        function renderDetail(appId) {
+            let app = allApps.find(a => a.id == appId);
+            if (!app) {
+                document.getElementById('home-view').classList.remove('hidden');
+                document.getElementById('detail-view').classList.add('hidden');
+                displayApps(allApps);
+                return;
+            }
+
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('detail-view').classList.remove('hidden');
+
+            document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
+
+            document.getElementById('app-detail-content').innerHTML = `
+                <div class="flex flex-col items-center text-center">
+                    <img src="${app.logoUrl}" class="w-24 h-24 rounded-3xl object-cover bg-slate-950 border border-slate-800 mb-4 shadow-lg">
+                    <h2 class="text-2xl font-bold text-white mb-1">${app.appName}</h2>
+                    <p class="text-xs text-blue-400 font-mono mb-2">${app.packageName || ''}</p>
+                    <p class="text-xs text-slate-400 mb-6 max-w-sm">${app.description || ''}</p>
+                    
+                    <div class="grid grid-cols-2 gap-4 w-full bg-slate-950 p-4 rounded-xl border border-slate-800 mb-6 text-left text-xs">
+                        <div><span class="text-slate-500 block">Version</span> <strong class="text-slate-200">${app.version || '1.0'}</strong></div>
+                        <div><span class="text-slate-500 block">File Size</span> <strong class="text-slate-200">${app.size || 'N/A'}</strong></div>
+                    </div>
+
+                    <button id="downloadBtn" onclick="startDownload('${app.archiveUrl}')" class="w-full py-3.5 bg-blue-600 hover:bg-blue-500 rounded-xl font-bold text-sm transition shadow-lg shadow-blue-600/30 text-center block">
+                        Download APK
+                    </button>
+                </div>
+            `;
+
+            let relatedApps = allApps.filter(a => a.id != appId);
+            const relatedGrid = document.getElementById('related-apps-grid');
+            
+            if (relatedApps.length === 0) {
+                relatedGrid.innerHTML = '<p class="text-xs text-slate-500">No other apps available.</p>';
+            } else {
+                relatedGrid.innerHTML = relatedApps.slice(0, 4).map(rel => `
+                    <div onclick="openApp('${rel.id}')" class="flex items-center justify-between p-3 bg-slate-900 hover:bg-slate-900/80 rounded-xl border border-slate-800 cursor-pointer transition">
+                        <div class="flex items-center gap-3">
+                            <img src="${rel.logoUrl}" class="w-10 h-10 rounded-xl object-cover bg-slate-950 border border-slate-800">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-200">${rel.appName}</h4>
+                                <p class="text-[11px] text-slate-400">Ver: ${rel.version || '1.0'}</p>
+                            </div>
+                        </div>
+                        <span class="text-xs text-blue-400 font-semibold px-3 py-1 bg-blue-600/10 border border-blue-500/20 rounded-lg">View</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function startDownload(url) {
+            const btn = document.getElementById('downloadBtn');
+            btn.disabled = true;
+            let count = 5;
+            btn.innerText = `Preparing download in ${count}s...`;
+            let t = setInterval(() => {
+                count--;
+                if(count > 0) {
+                    btn.innerText = `Preparing download in ${count}s...`;
+                } else {
+                    clearInterval(t);
+                    btn.innerText = `Download Starting...`;
+                    window.location.href = url;
+                    setTimeout(() => { btn.disabled = false; btn.innerText = `Download APK`; }, 3000);
+                }
+            }, 1000);
+        }
+
+        function goBack() {
+            window.location.hash = '';
+            document.getElementById('detail-view').classList.add('hidden');
+            document.getElementById('home-view').classList.remove('hidden');
+            displayApps(allApps);
+        }
+
+        function checkRoute() {
+            const hash = window.location.hash;
+            if (hash.includes('app=')) {
+                const match = hash.match(/app=([^&]+)/);
+                if (match) renderDetail(match[1]);
+            } else {
+                document.getElementById('detail-view').classList.add('hidden');
+                document.getElementById('home-view').classList.remove('hidden');
+                displayApps(allApps);
+            }
+        }
+
+        window.onhashchange = checkRoute;
+        initStore();
+    </script>
+</body>
+</html>
