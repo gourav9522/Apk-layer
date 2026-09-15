@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApkLayer - Free Android App Store</title>
+    <title id="pageTitle">ApkLayer - Free Android App Store</title>
+    <meta id="pageDesc" name="description" content="Download trusted Android apps and games safely on ApkLayer.">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-white min-h-screen p-4">
@@ -64,8 +65,6 @@
 
     <script>
         const FIREBASE_DB_URL = "https://apk-layer-default-rtdb.firebaseio.com/apps";
-        const APP_PACKAGE_NAME = "apklayer.aivf"; 
-
         let allApps = [];
         let isAdminUnlocked = false;
         let bannerClicks = 0;
@@ -111,7 +110,7 @@
             }
 
             displayApps(allApps);
-            checkRoute();
+            checkRoute(); // Check hash on load
         }
 
         function displayApps(apps) {
@@ -145,11 +144,12 @@
         }
 
         function shareApp(appId, appName) {
-            const webUrl = window.location.origin + window.location.pathname + `#app=${appId}`;
+            // Clean share link using main domain root
+            const webUrl = "https://apk-layer.vercel.app/#app=" + appId;
             if (navigator.share) {
                 navigator.share({
                     title: appName,
-                    text: `Check out ${appName} on ApkLayer!`,
+                    text: `Download ${appName} on ApkLayer!`,
                     url: webUrl
                 }).catch(() => {});
             } else {
@@ -195,11 +195,16 @@
         function renderDetail(appId) {
             let app = allApps.find(a => a.id == appId);
             if (!app) {
+                document.getElementById('pageTitle').innerText = "ApkLayer - Free Android App Store";
                 document.getElementById('home-view').classList.remove('hidden');
                 document.getElementById('detail-view').classList.add('hidden');
                 displayApps(allApps);
                 return;
             }
+
+            // Update Page Title and Meta for SEO/Tab Name when viewing an app
+            document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
+            document.getElementById('pageDesc').content = app.description || `Download ${app.appName} safely from ApkLayer.`;
 
             document.getElementById('home-view').classList.add('hidden');
             document.getElementById('detail-view').classList.remove('hidden');
@@ -265,6 +270,7 @@
 
         function goBack() {
             window.location.hash = '';
+            document.getElementById('pageTitle').innerText = "ApkLayer - Free Android App Store";
             document.getElementById('detail-view').classList.add('hidden');
             document.getElementById('home-view').classList.remove('hidden');
             displayApps(allApps);
@@ -274,11 +280,14 @@
             const hash = window.location.hash;
             if (hash.includes('app=')) {
                 const match = hash.match(/app=([^&]+)/);
-                if (match) renderDetail(match[1]);
-            } else {
-                document.getElementById('detail-view').classList.add('hidden');
-                document.getElementById('home-view').classList.remove('hidden');
-                displayApps(allApps);
+                if (match) {
+                    if (allApps.length > 0) {
+                        renderDetail(match[1]);
+                    } else {
+                        // Wait a second for apps to load if checkRoute runs before fetch completes
+                        setTimeout(() => renderDetail(match[1]), 500);
+                    }
+                }
             }
         }
 
