@@ -34,6 +34,12 @@
     </style>
 </head>
 <body class="bg-slate-950 text-white min-h-screen p-4">
+
+    <!-- ========================================== -->
+    <!-- APNI ADMOLO SCRIPT YAHAN PASTE KAREN (BODY KE JUST BAAD) -->
+    <!-- ========================================== -->
+
+
     <div class="max-w-3xl mx-auto py-6">
         
         <!-- Banner Image with Secret Click Trigger (Tap 5 times) -->
@@ -89,27 +95,8 @@
         </div>
     </div>
 
-    <!-- Admolo Ad Integration Script Container -->
-    <div id="admolo-ad-container"></div>
-
-    <!-- Admolo Script Integration Between Body and Main Script -->
-    <script type="text/javascript">
-        (function() {
-            try {
-                const zoneId = "YZF3UV7NDNOQGC355O7DQMTASJXU6FRM";
-                const adScriptTag = document.createElement('script');
-                adScriptTag.async = true;
-                adScriptTag.src = "https://admolo.com/tag.js?zone=" + zoneId;
-                document.getElementById('admolo-ad-container').appendChild(adScriptTag);
-            } catch (err) {
-                console.error("Ad loading error", err);
-            }
-        })();
-    </script>
-
     <script>
         const FIREBASE_DB_URL = "https://apk-layer-default-rtdb.firebaseio.com/apps";
-        const ADMOLO_CODE = "YZF3UV7NDNOQGC355O7DQMTASJXU6FRM";
         let allApps = [];
         let isAdminUnlocked = false;
         let bannerClicks = 0;
