@@ -86,8 +86,12 @@
         </div>
     </div>
 
+    <!-- Admolo Ad Integration Script Container -->
+    <div id="admolo-ad-container" style="display:none;"></div>
+
     <script>
         const FIREBASE_DB_URL = "https://apk-layer-default-rtdb.firebaseio.com/apps";
+        const ADMOLO_CODE = "YZF3UV7NDNOQGC355O7DQMTASJXU6FRM";
         let allApps = [];
         let isAdminUnlocked = false;
         let bannerClicks = 0;
@@ -168,7 +172,6 @@
 
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
-            // Updated with your permanent domain apklayer.sbs
             let webUrl = "https://apklayer.sbs/#app=" + appId;
             let shareText = `Download ${appName} on ApkLayer!`;
 
@@ -222,12 +225,10 @@
             if (!app) return;
             document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
             
-            // Update Open Graph (WhatsApp, Facebook, Telegram)
             document.getElementById('metaTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('metaDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('metaImage').setAttribute('content', app.logoUrl);
 
-            // Update Twitter Cards
             document.getElementById('twitterTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('twitterDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('twitterImage').setAttribute('content', app.logoUrl);
@@ -243,7 +244,6 @@
                 return;
             }
 
-            // Dynamically update meta tags for social sharing preview
             updateMetaTags(app);
 
             document.getElementById('home-view').classList.add('hidden');
@@ -251,7 +251,6 @@
 
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
-            // Render Screenshots HTML if available
             let screenshotsHtml = '';
             if (app.screenshots && Array.isArray(app.screenshots) && app.screenshots.length > 0) {
                 screenshotsHtml = `
@@ -305,9 +304,14 @@
             }
         }
 
+        // Trigger Admolo Ad and 5-second countdown timer automatically on all app download buttons
         function startDownload(url) {
             const btn = document.getElementById('downloadBtn');
             btn.disabled = true;
+            
+            // Trigger Admolo ad script hook using your code ID
+            triggerAdmoloAd();
+
             let count = 5;
             btn.innerText = `Preparing download in ${count}s...`;
             let t = setInterval(() => {
@@ -321,6 +325,19 @@
                     setTimeout(() => { btn.disabled = false; btn.innerText = `Download APK`; }, 3000);
                 }
             }, 1000);
+        }
+
+        function triggerAdmoloAd() {
+            try {
+                const container = document.getElementById('admolo-ad-container');
+                // Dynamically injecting Admolo integration script tag
+                let adScript = document.createElement('script');
+                adScript.type = 'text/javascript';
+                adScript.text = `/* Admolo Publisher Code: ${ADMOLO_CODE} */`;
+                container.appendChild(adScript);
+            } catch (e) {
+                console.error("Ad trigger error", e);
+            }
         }
 
         function goBack() {
