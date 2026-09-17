@@ -39,12 +39,6 @@
             <strong class="text-amber-400">Disclaimer:</strong> If any company, developer, or copyright holder has any issue with any app listed on this platform, please contact us directly at <span class="text-emerald-400 font-mono">apklayer@gmail.com</span> to request immediate removal, rather than issuing copyright strikes or takedowns.
         </div>
 
-        <!-- Top Banner Ad Slot (Admolo Integration) -->
-        <div id="admolo-banner-ad" class="mb-6 p-2 bg-slate-900 border emerald-border rounded-2xl text-center min-h-[50px] flex items-center justify-center">
-            <!-- Admolo ad banner code will render here -->
-            <span class="text-[10px] text-slate-600 font-mono">Ad Space</span>
-        </div>
-
         <div class="flex justify-between items-center mb-6">
             <div>
                 <h1 class="text-3xl font-extrabold text-emerald-400 gold-glow">ApkLayer</h1>
@@ -58,7 +52,12 @@
         <!-- Main Store View -->
         <div id="home-view">
             <input type="text" id="search" placeholder="Search global apps by name..." onkeyup="filterApps()" 
-                class="w-full p-4 rounded-xl bg-slate-900 border emerald-border text-white focus:outline-none mb-6 text-sm">
+                class="w-full p-4 rounded-xl bg-slate-900 border emerald-border text-white focus:outline-none mb-4 text-sm">
+
+            <!-- ADMOLLO BODY AD SLOT (Home Page) -->
+            <div id="admolo-body-ad-home" class="mb-6 p-3 bg-slate-900 border emerald-border rounded-2xl text-center min-h-[60px] flex items-center justify-center overflow-hidden shadow-md">
+                <span class="text-[11px] text-slate-500 font-mono">Advertisement Space</span>
+            </div>
 
             <div id="loadingText" class="text-center py-10 text-slate-400 text-sm">Fetching apps from worldwide server...</div>
             <div id="app-grid" class="grid grid-cols-1 gap-3"></div>
@@ -83,9 +82,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Hidden Admolo Pop/Interstital Container -->
-    <div id="admolo-ad-container" style="display:none;"></div>
 
     <script>
         const FIREBASE_DB_URL = "https://apk-layer-default-rtdb.firebaseio.com/apps";
@@ -136,7 +132,7 @@
 
             displayApps(allApps);
             checkRoute();
-            loadAdmoloBannerAds(); // Load ads on startup
+            injectAdmoloAds(); // Render body ads on load
         }
 
         function displayApps(apps) {
@@ -266,11 +262,19 @@
 
                     ${screenshotsHtml}
 
+                    <!-- ADMOLLO BODY AD SLOT (Inside App Detail Page, right above Download button) -->
+                    <div id="admolo-body-ad-detail" class="mb-6 p-3 bg-slate-950 border emerald-border rounded-2xl text-center w-full min-h-[60px] flex items-center justify-center overflow-hidden">
+                        <span class="text-[11px] text-slate-500 font-mono">Advertisement Space</span>
+                    </div>
+
                     <button id="downloadBtn" onclick="startDownload('${app.archiveUrl}')" class="w-full py-4 bg-gradient-to-r from-emerald-600 to-amber-600 hover:from-emerald-500 hover:to-amber-500 rounded-2xl font-extrabold text-sm transition shadow-lg shadow-emerald-900/30 text-white cursor-pointer">
                         Download APK
                     </button>
                 </div>
             `;
+
+            // Re-inject ads for the newly created detail ad container
+            injectAdmoloAds();
 
             let relatedApps = allApps.filter(a => a.id != appId);
             const relatedGrid = document.getElementById('related-apps-grid');
@@ -293,12 +297,10 @@
             }
         }
 
-        // Trigger countdown timer and ad popup when user clicks Download
+        // Countdown timer and download trigger
         function startDownload(url) {
             const btn = document.getElementById('downloadBtn');
             btn.disabled = true;
-            
-            triggerAdmoloAd(); // Trigger pop / interstitial ad code here
 
             let count = 5;
             btn.innerText = `Preparing download in ${count}s...`;
@@ -315,23 +317,14 @@
             }, 1000);
         }
 
-        // Real structure for loading Admolo banner/scripts
-        function loadAdmoloBannerAds() {
+        // Function to inject Admolo ad scripts into body containers
+        function injectAdmoloAds() {
             try {
-                const bannerContainer = document.getElementById('admolo-banner-ad');
-                // Agar Admolo ne tumhe banner script di hai, toh use yahan load karwa sakte hain
-                // Jaise: bannerContainer.innerHTML = '<script src="..."><\/script>';
+                // Agar Admolo ne banner script di hai, toh use yahan active kar sakte hain.
+                // Filhal yeh verification aur publisher code ke sath active hook maintain kar raha hai.
+                console.log("Admolo ad slots initialized for Publisher:", ADMOLO_CODE);
             } catch (e) {
-                console.error("Banner ad error", e);
-            }
-        }
-
-        function triggerAdmoloAd() {
-            try {
-                // Jab user download dabaye, tab interstitial ya pop ad script trigger ho
-                console.log("Admolo Ad triggered for Publisher Code:", ADMOLO_CODE);
-            } catch (e) {
-                console.error("Ad trigger error", e);
+                console.error("Ad injection error", e);
             }
         }
 
