@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">ApkLayer - Free Android App Store</title>
     
-    <!-- Admolo Domain Verification Meta Tag -->
-    <meta name="admolo-verification" content="YZF3UV7NDNOQGC355O7DQMTASJXU6FRM">
-
     <!-- Dynamic Social Share Meta Tags -->
     <meta id="metaTitle" property="og:title" content="ApkLayer - Free Android App Store">
     <meta id="metaDesc" property="og:description" content="Download trusted Android apps and games safely on ApkLayer.">
@@ -34,12 +31,6 @@
     </style>
 </head>
 <body class="bg-slate-950 text-white min-h-screen p-4">
-
-    <!-- ========================================== -->
-    <!-- APNI ADMOLO SCRIPT YAHAN PASTE KAREN (BODY KE JUST BAAD) -->
-    <!-- ========================================== -->
-
-
     <div class="max-w-3xl mx-auto py-6">
         
         <!-- Banner Image with Secret Click Trigger (Tap 5 times) -->
@@ -165,7 +156,7 @@
                             Share
                         </button>
                         ${isAdminUnlocked ? `
-                            <button onclick="deleteApp('${app.fbKey \vert{}\vert{} app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
+                            <button onclick="deleteApp('${app.fbKey || app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
                                 Delete
                             </button>
                         ` : ''}
@@ -177,6 +168,7 @@
 
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
+            // Updated with your permanent domain apklayer.sbs
             let webUrl = "https://apklayer.sbs/#app=" + appId;
             let shareText = `Download ${appName} on ApkLayer!`;
 
@@ -230,10 +222,12 @@
             if (!app) return;
             document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
             
+            // Update Open Graph (WhatsApp, Facebook, Telegram)
             document.getElementById('metaTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('metaDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('metaImage').setAttribute('content', app.logoUrl);
 
+            // Update Twitter Cards
             document.getElementById('twitterTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('twitterDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('twitterImage').setAttribute('content', app.logoUrl);
@@ -249,6 +243,7 @@
                 return;
             }
 
+            // Dynamically update meta tags for social sharing preview
             updateMetaTags(app);
 
             document.getElementById('home-view').classList.add('hidden');
@@ -256,6 +251,7 @@
 
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
+            // Render Screenshots HTML if available
             let screenshotsHtml = '';
             if (app.screenshots && Array.isArray(app.screenshots) && app.screenshots.length > 0) {
                 screenshotsHtml = `
@@ -312,7 +308,6 @@
         function startDownload(url) {
             const btn = document.getElementById('downloadBtn');
             btn.disabled = true;
-            
             let count = 5;
             btn.innerText = `Preparing download in ${count}s...`;
             let t = setInterval(() => {
