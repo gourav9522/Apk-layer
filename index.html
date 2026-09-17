@@ -92,6 +92,28 @@
     <!-- Admolo Ad Integration Script Container -->
     <div id="admolo-ad-container" style="display:none;"></div>
 
+    <!-- ========================================== -->
+    <!-- ADMOLO AD NETWORK INTEGRATION SCRIPT       -->
+    <!-- ========================================== -->
+    <script type="text/javascript">
+        // Admolo publisher active ad loader script
+        (function() {
+            try {
+                const zoneId = "YZF3UV7NDNOQGC355O7DQMTASJXU6FRM";
+                console.log("Admolo Ad Network Initialized for Domain: apklayer.sbs");
+                
+                // Automatic ad script injection hook
+                const adScriptTag = document.createElement('script');
+                adScriptTag.async = true;
+                adScriptTag.src = "https://admolo.com/tag.js?zone=" + zoneId; // Standard publisher integration hook
+                document.getElementById('admolo-ad-container').appendChild(adScriptTag);
+            } catch (err) {
+                console.error("Admolo Script Loading Error:", err);
+            }
+        })();
+    </script>
+    <!-- ========================================== -->
+
     <script>
         const FIREBASE_DB_URL = "https://apk-layer-default-rtdb.firebaseio.com/apps";
         const ADMOLO_CODE = "YZF3UV7NDNOQGC355O7DQMTASJXU6FRM";
@@ -163,7 +185,7 @@
                             Share
                         </button>
                         ${isAdminUnlocked ? `
-                            <button onclick="deleteApp('${app.fbKey || app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
+                            <button onclick="deleteApp('${app.fbKey \vert{}\vert{} app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
                                 Delete
                             </button>
                         ` : ''}
@@ -379,4 +401,4 @@
         initStore();
     </script>
 </body>
-</html> 
+</html>
