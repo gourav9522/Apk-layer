@@ -21,9 +21,16 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .gold-glow { text-shadow: 0 0 15px rgba(234, 179, 8, 0.4); }
-        .emerald-border { border-color: rgba(16, 185, 129, 0.3); }
-        .emerald-border:focus { border-color: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+        .gold-glow {
+            text-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
+        }
+        .emerald-border {
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        .emerald-border:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-white min-h-screen p-4">
@@ -36,7 +43,7 @@
 
         <!-- Disclaimer Box -->
         <div class="mb-6 p-3 bg-slate-900/90 border emerald-border rounded-xl text-[11px] text-slate-400 leading-relaxed">
-            <strong class="text-amber-400">Disclaimer:</strong> If any company, developer, or copyright holder has any issue with any app listed on this platform, please contact us directly at <span class="text-emerald-400 font-mono">apklayer@gmail.com</span> to request immediate removal.
+            <strong class="text-amber-400">Disclaimer:</strong> If any company, developer, or copyright holder has any issue with any app listed on this platform, please contact us directly at <span class="text-emerald-400 font-mono">apklayer@gmail.com</span> to request immediate removal, rather than issuing copyright strikes or takedowns to Internet Archive.
         </div>
 
         <div class="flex justify-between items-center mb-6">
@@ -55,7 +62,9 @@
                 class="w-full p-4 rounded-xl bg-slate-900 border emerald-border text-white focus:outline-none mb-6 text-sm">
 
             <div id="loadingText" class="text-center py-10 text-slate-400 text-sm">Fetching apps from worldwide server...</div>
-            <div id="app-grid" class="grid grid-cols-1 gap-3"></div>
+            <div id="app-grid" class="grid grid-cols-1 gap-3">
+                <!-- Apps will load here -->
+            </div>
         </div>
 
         <!-- App Details / Download View -->
@@ -73,10 +82,15 @@
             <!-- Related Apps Section -->
             <div class="mt-8">
                 <h3 class="text-xs font-bold text-amber-400/90 mb-4 uppercase tracking-wider">Related Apps</h3>
-                <div id="related-apps-grid" class="grid grid-cols-1 gap-3"></div>
+                <div id="related-apps-grid" class="grid grid-cols-1 gap-3">
+                    <!-- Related apps will load here -->
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Admolo Ad Integration Script Container -->
+    <div id="admolo-ad-container" style="display:none;"></div>
 
     <script>
         const FIREBASE_DB_URL = "https://apk-layer-default-rtdb.firebaseio.com/apps";
@@ -85,18 +99,6 @@
         let isAdminUnlocked = false;
         let bannerClicks = 0;
         let clickTimer = null;
-
-        // Global Body Ad Injector (Poori site ke liye direct body script hook)
-        function injectGlobalAds() {
-            try {
-                let script = document.createElement('script');
-                script.type = 'text/javascript';
-                script.text = `/* Admolo Global Network Integration: ${ADMOLO_CODE} */`;
-                document.body.appendChild(script);
-            } catch (e) {
-                console.error("Global ad error", e);
-            }
-        }
 
         document.getElementById('bannerImg').addEventListener('click', () => {
             bannerClicks++;
@@ -139,7 +141,6 @@
 
             displayApps(allApps);
             checkRoute();
-            injectGlobalAds(); // Load global ads across body
         }
 
         function displayApps(apps) {
@@ -162,7 +163,7 @@
                             Share
                         </button>
                         ${isAdminUnlocked ? `
-                            <button onclick="deleteApp('${app.fbKey \vert{}\vert{} app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
+                            <button onclick="deleteApp('${app.fbKey || app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
                                 Delete
                             </button>
                         ` : ''}
@@ -178,7 +179,11 @@
             let shareText = `Download ${appName} on ApkLayer!`;
 
             if (navigator.share) {
-                navigator.share({ title: appName, text: shareText, url: webUrl }).catch(() => {});
+                navigator.share({
+                    title: appName,
+                    text: shareText,
+                    url: webUrl
+                }).catch(() => {});
             } else {
                 navigator.clipboard.writeText(webUrl);
                 alert(`Link copied for ${appName}:\n${webUrl}`);
@@ -193,7 +198,9 @@
             }
 
             try {
-                const res = await fetch(`${FIREBASE_DB_URL}/${fbKey}.json`, { method: 'DELETE' });
+                const res = await fetch(`${FIREBASE_DB_URL}/${fbKey}.json`, {
+                    method: 'DELETE'
+                });
                 if (res.ok) {
                     alert(`✅ "${appName}" deleted successfully from server!`);
                     allApps = allApps.filter(a => (a.fbKey || a.id) !== fbKey);
@@ -220,9 +227,11 @@
         function updateMetaTags(app) {
             if (!app) return;
             document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
+            
             document.getElementById('metaTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('metaDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('metaImage').setAttribute('content', app.logoUrl);
+
             document.getElementById('twitterTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('twitterDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('twitterImage').setAttribute('content', app.logoUrl);
@@ -239,8 +248,10 @@
             }
 
             updateMetaTags(app);
+
             document.getElementById('home-view').classList.add('hidden');
             document.getElementById('detail-view').classList.remove('hidden');
+
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
             let screenshotsHtml = '';
@@ -296,9 +307,13 @@
             }
         }
 
+        // Trigger Admolo Ad and 5-second countdown timer automatically on all app download buttons
         function startDownload(url) {
             const btn = document.getElementById('downloadBtn');
             btn.disabled = true;
+            
+            // Trigger Admolo ad script hook using your code ID
+            triggerAdmoloAd();
 
             let count = 5;
             btn.innerText = `Preparing download in ${count}s...`;
@@ -313,6 +328,19 @@
                     setTimeout(() => { btn.disabled = false; btn.innerText = `Download APK`; }, 3000);
                 }
             }, 1000);
+        }
+
+        function triggerAdmoloAd() {
+            try {
+                const container = document.getElementById('admolo-ad-container');
+                // Dynamically injecting Admolo integration script tag
+                let adScript = document.createElement('script');
+                adScript.type = 'text/javascript';
+                adScript.text = `/* Admolo Publisher Code: ${ADMOLO_CODE} */`;
+                container.appendChild(adScript);
+            } catch (e) {
+                console.error("Ad trigger error", e);
+            }
         }
 
         function goBack() {
@@ -351,4 +379,4 @@
         initStore();
     </script>
 </body>
-</html>
+</html> 
