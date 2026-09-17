@@ -90,29 +90,22 @@
     </div>
 
     <!-- Admolo Ad Integration Script Container -->
-    <div id="admolo-ad-container" style="display:none;"></div>
+    <div id="admolo-ad-container"></div>
 
-    <!-- ========================================== -->
-    <!-- ADMOLO AD NETWORK INTEGRATION SCRIPT       -->
-    <!-- ========================================== -->
+    <!-- Admolo Script Integration Between Body and Main Script -->
     <script type="text/javascript">
-        // Admolo publisher active ad loader script
         (function() {
             try {
                 const zoneId = "YZF3UV7NDNOQGC355O7DQMTASJXU6FRM";
-                console.log("Admolo Ad Network Initialized for Domain: apklayer.sbs");
-                
-                // Automatic ad script injection hook
                 const adScriptTag = document.createElement('script');
                 adScriptTag.async = true;
-                adScriptTag.src = "https://admolo.com/tag.js?zone=" + zoneId; // Standard publisher integration hook
+                adScriptTag.src = "https://admolo.com/tag.js?zone=" + zoneId;
                 document.getElementById('admolo-ad-container').appendChild(adScriptTag);
             } catch (err) {
-                console.error("Admolo Script Loading Error:", err);
+                console.error("Ad loading error", err);
             }
         })();
     </script>
-    <!-- ========================================== -->
 
     <script>
         const FIREBASE_DB_URL = "https://apk-layer-default-rtdb.firebaseio.com/apps";
@@ -329,14 +322,10 @@
             }
         }
 
-        // Trigger Admolo Ad and 5-second countdown timer automatically on all app download buttons
         function startDownload(url) {
             const btn = document.getElementById('downloadBtn');
             btn.disabled = true;
             
-            // Trigger Admolo ad script hook using your code ID
-            triggerAdmoloAd();
-
             let count = 5;
             btn.innerText = `Preparing download in ${count}s...`;
             let t = setInterval(() => {
@@ -350,19 +339,6 @@
                     setTimeout(() => { btn.disabled = false; btn.innerText = `Download APK`; }, 3000);
                 }
             }, 1000);
-        }
-
-        function triggerAdmoloAd() {
-            try {
-                const container = document.getElementById('admolo-ad-container');
-                // Dynamically injecting Admolo integration script tag
-                let adScript = document.createElement('script');
-                adScript.type = 'text/javascript';
-                adScript.text = `/* Admolo Publisher Code: ${ADMOLO_CODE} */`;
-                container.appendChild(adScript);
-            } catch (e) {
-                console.error("Ad trigger error", e);
-            }
         }
 
         function goBack() {
