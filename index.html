@@ -40,7 +40,7 @@
 
         <!-- Disclaimer Box -->
         <div class="mb-6 p-3 bg-slate-900/90 border emerald-border rounded-xl text-[11px] text-slate-400 leading-relaxed">
-            <strong class="text-amber-400">Disclaimer:</strong> If any company, developer, or copyright holder has any issue with any app listed on this platform, please contact us directly at <span class="text-emerald-400 font-mono">your-email@example.com</span> to request immediate removal, rather than issuing copyright strikes or takedowns to Internet Archive.
+            <strong class="text-amber-400">Disclaimer:</strong> If any company, developer, or copyright holder has any issue with any app listed on this platform, please contact us directly at <span class="text-emerald-400 font-mono">apklayer@gmail.com</span> to request immediate removal, rather than issuing copyright strikes or takedowns to Internet Archive.
         </div>
 
         <div class="flex justify-between items-center mb-6">
@@ -168,7 +168,8 @@
 
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
-            let webUrl = window.location.origin + window.location.pathname + "#app=" + appId;
+            // Updated with your permanent domain apklayer.sbs
+            let webUrl = "https://apklayer.sbs/#app=" + appId;
             let shareText = `Download ${appName} on ApkLayer!`;
 
             if (navigator.share) {
