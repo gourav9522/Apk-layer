@@ -36,7 +36,7 @@
 
         <!-- Disclaimer Box -->
         <div class="mb-6 p-3 bg-slate-900/90 border emerald-border rounded-xl text-[11px] text-slate-400 leading-relaxed">
-            <strong class="text-amber-400">Disclaimer:</strong> If any company, developer, or copyright holder has any issue with any app listed on this platform, please contact us directly at <span class="text-emerald-400 font-mono">apklayer@gmail.com</span> to request immediate removal, rather than issuing copyright strikes or takedowns.
+            <strong class="text-amber-400">Disclaimer:</strong> If any company, developer, or copyright holder has any issue with any app listed on this platform, please contact us directly at <span class="text-emerald-400 font-mono">apklayer@gmail.com</span> to request immediate removal.
         </div>
 
         <div class="flex justify-between items-center mb-6">
@@ -52,12 +52,7 @@
         <!-- Main Store View -->
         <div id="home-view">
             <input type="text" id="search" placeholder="Search global apps by name..." onkeyup="filterApps()" 
-                class="w-full p-4 rounded-xl bg-slate-900 border emerald-border text-white focus:outline-none mb-4 text-sm">
-
-            <!-- ADMOLLO BODY AD SLOT (Home Page) -->
-            <div id="admolo-body-ad-home" class="mb-6 p-3 bg-slate-900 border emerald-border rounded-2xl text-center min-h-[60px] flex items-center justify-center overflow-hidden shadow-md">
-                <span class="text-[11px] text-slate-500 font-mono">Advertisement Space</span>
-            </div>
+                class="w-full p-4 rounded-xl bg-slate-900 border emerald-border text-white focus:outline-none mb-6 text-sm">
 
             <div id="loadingText" class="text-center py-10 text-slate-400 text-sm">Fetching apps from worldwide server...</div>
             <div id="app-grid" class="grid grid-cols-1 gap-3"></div>
@@ -90,6 +85,18 @@
         let isAdminUnlocked = false;
         let bannerClicks = 0;
         let clickTimer = null;
+
+        // Global Body Ad Injector (Poori site ke liye direct body script hook)
+        function injectGlobalAds() {
+            try {
+                let script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.text = `/* Admolo Global Network Integration: ${ADMOLO_CODE} */`;
+                document.body.appendChild(script);
+            } catch (e) {
+                console.error("Global ad error", e);
+            }
+        }
 
         document.getElementById('bannerImg').addEventListener('click', () => {
             bannerClicks++;
@@ -132,7 +139,7 @@
 
             displayApps(allApps);
             checkRoute();
-            injectAdmoloAds(); // Render body ads on load
+            injectGlobalAds(); // Load global ads across body
         }
 
         function displayApps(apps) {
@@ -262,19 +269,11 @@
 
                     ${screenshotsHtml}
 
-                    <!-- ADMOLLO BODY AD SLOT (Inside App Detail Page, right above Download button) -->
-                    <div id="admolo-body-ad-detail" class="mb-6 p-3 bg-slate-950 border emerald-border rounded-2xl text-center w-full min-h-[60px] flex items-center justify-center overflow-hidden">
-                        <span class="text-[11px] text-slate-500 font-mono">Advertisement Space</span>
-                    </div>
-
                     <button id="downloadBtn" onclick="startDownload('${app.archiveUrl}')" class="w-full py-4 bg-gradient-to-r from-emerald-600 to-amber-600 hover:from-emerald-500 hover:to-amber-500 rounded-2xl font-extrabold text-sm transition shadow-lg shadow-emerald-900/30 text-white cursor-pointer">
                         Download APK
                     </button>
                 </div>
             `;
-
-            // Re-inject ads for the newly created detail ad container
-            injectAdmoloAds();
 
             let relatedApps = allApps.filter(a => a.id != appId);
             const relatedGrid = document.getElementById('related-apps-grid');
@@ -297,7 +296,6 @@
             }
         }
 
-        // Countdown timer and download trigger
         function startDownload(url) {
             const btn = document.getElementById('downloadBtn');
             btn.disabled = true;
@@ -315,17 +313,6 @@
                     setTimeout(() => { btn.disabled = false; btn.innerText = `Download APK`; }, 3000);
                 }
             }, 1000);
-        }
-
-        // Function to inject Admolo ad scripts into body containers
-        function injectAdmoloAds() {
-            try {
-                // Agar Admolo ne banner script di hai, toh use yahan active kar sakte hain.
-                // Filhal yeh verification aur publisher code ke sath active hook maintain kar raha hai.
-                console.log("Admolo ad slots initialized for Publisher:", ADMOLO_CODE);
-            } catch (e) {
-                console.error("Ad injection error", e);
-            }
         }
 
         function goBack() {
