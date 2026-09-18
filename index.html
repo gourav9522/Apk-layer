@@ -62,13 +62,6 @@
             <div id="app-grid" class="grid grid-cols-1 gap-3">
                 <!-- Apps will load here -->
             </div>
-            
-            <!-- See More Button Container -->
-            <div id="seeMoreContainer" class="mt-6 text-center hidden">
-                <button onclick="loadMoreApps()" class="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-emerald-400 border emerald-border rounded-xl text-xs font-bold transition shadow-md">
-                    See More Apps ▼
-                </button>
-            </div>
         </div>
 
         <!-- App Details / Download View -->
@@ -96,8 +89,6 @@
     <script>
         const FIREBASE_DB_URL = "https://apk-layer-default-rtdb.firebaseio.com/apps";
         let allApps = [];
-        let displayedLimit = 10; // Shuru mein 10 apps dikhengi
-        let currentFilteredApps = [];
         let isAdminUnlocked = false;
         let bannerClicks = 0;
         let clickTimer = null;
@@ -119,7 +110,7 @@
                 isAdminUnlocked = true;
                 document.getElementById('adminBadge').classList.remove('hidden');
                 alert("🔓 Admin mode unlocked! You can now delete apps.");
-                displayApps(currentFilteredApps);
+                displayApps(allApps);
             } else if (pass !== null) {
                 alert("❌ Wrong password!");
             }
@@ -141,26 +132,17 @@
                 if (loadingText) loadingText.style.display = 'none';
             }
 
-            currentFilteredApps = allApps;
-            displayedLimit = 10;
-            displayApps(currentFilteredApps);
+            displayApps(allApps);
             checkRoute();
         }
 
         function displayApps(apps) {
-            currentFilteredApps = apps;
             const grid = document.getElementById('app-grid');
-            const seeMoreContainer = document.getElementById('seeMoreContainer');
-
             if(apps.length === 0) {
                 grid.innerHTML = '<p class="text-slate-500 text-center py-10">No apps found globally. Upload via Console!</p>';
-                seeMoreContainer.classList.add('hidden');
                 return;
             }
-
-            const appsToShow = apps.slice(0, displayedLimit);
-
-            grid.innerHTML = appsToShow.map(app => `
+            grid.innerHTML = apps.map(app => `
                 <div class="flex items-center justify-between p-4 bg-slate-900 hover:bg-slate-900/80 rounded-2xl border emerald-border transition shadow-md">
                     <div onclick="openApp('${app.id}')" class="flex items-center gap-4 flex-1 cursor-pointer">
                         <img src="${app.logoUrl}" alt="${app.appName}" class="w-14 h-14 rounded-2xl object-cover bg-slate-950 border emerald-border">
@@ -174,7 +156,7 @@
                             Share
                         </button>
                         ${isAdminUnlocked ? `
-                            <button onclick="deleteApp('${app.fbKey \vert{}\vert{} app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
+                            <button onclick="deleteApp('${app.fbKey || app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
                                 Delete
                             </button>
                         ` : ''}
@@ -182,22 +164,11 @@
                     </div>
                 </div>
             `).join('');
-
-            // Agar aur apps bachi hain toh "See More" button dikhao, nahi toh chhupa do
-            if (displayedLimit < apps.length) {
-                seeMoreContainer.classList.remove('hidden');
-            } else {
-                seeMoreContainer.classList.add('hidden');
-            }
-        }
-
-        function loadMoreApps() {
-            displayedLimit += 10; // 10 aur apps badha do
-            displayApps(currentFilteredApps);
         }
 
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
+            // Updated with your permanent domain apklayer.sbs
             let webUrl = "https://apklayer.sbs/#app=" + appId;
             let shareText = `Download ${appName} on ApkLayer!`;
 
@@ -239,7 +210,6 @@
         function filterApps() {
             let query = document.getElementById('search').value.toLowerCase();
             let filtered = allApps.filter(app => app.appName.toLowerCase().includes(query));
-            displayedLimit = 10; // Search karne par wapas limit 10 set kar do
             displayApps(filtered);
         }
 
@@ -252,10 +222,12 @@
             if (!app) return;
             document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
             
+            // Update Open Graph (WhatsApp, Facebook, Telegram)
             document.getElementById('metaTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('metaDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('metaImage').setAttribute('content', app.logoUrl);
 
+            // Update Twitter Cards
             document.getElementById('twitterTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('twitterDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('twitterImage').setAttribute('content', app.logoUrl);
@@ -271,6 +243,7 @@
                 return;
             }
 
+            // Dynamically update meta tags for social sharing preview
             updateMetaTags(app);
 
             document.getElementById('home-view').classList.add('hidden');
@@ -278,6 +251,7 @@
 
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
+            // Render Screenshots HTML if available
             let screenshotsHtml = '';
             if (app.screenshots && Array.isArray(app.screenshots) && app.screenshots.length > 0) {
                 screenshotsHtml = `
@@ -310,16 +284,13 @@
                 </div>
             `;
 
-            // Related apps: Filter out current app, shuffle randomly, and pick EXACTLY 5 apps
             let relatedApps = allApps.filter(a => a.id != appId);
-            relatedApps.sort(() => Math.random() - 0.5); // Randomize order
-            
             const relatedGrid = document.getElementById('related-apps-grid');
             
             if (relatedApps.length === 0) {
                 relatedGrid.innerHTML = '<p class="text-xs text-slate-500">No other apps available.</p>';
             } else {
-                relatedGrid.innerHTML = relatedApps.slice(0, 5).map(rel => `
+                relatedGrid.innerHTML = relatedApps.slice(0, 4).map(rel => `
                     <div onclick="openApp('${rel.id}')" class="flex items-center justify-between p-3.5 bg-slate-900 hover:bg-slate-900/80 rounded-2xl border emerald-border cursor-pointer transition shadow-md">
                         <div class="flex items-center gap-3">
                             <img src="${rel.logoUrl}" class="w-11 h-11 rounded-xl object-cover bg-slate-950 border emerald-border">
