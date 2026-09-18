@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">ApkLayer - Free Android App Store</title>
     
-    <!-- Dynamic Social Share Meta Tags -->
     <meta id="metaTitle" property="og:title" content="ApkLayer - Free Android App Store">
     <meta id="metaDesc" property="og:description" content="Download trusted Android apps and games safely on ApkLayer.">
     <meta id="metaImage" property="og:image" content="https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg">
     
-    <!-- Twitter Card tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta id="twitterTitle" name="twitter:title" content="ApkLayer - Free Android App Store">
     <meta id="twitterDesc" name="twitter:description" content="Download trusted Android apps and games safely on ApkLayer.">
@@ -26,12 +24,10 @@
 <body class="bg-slate-950 text-white min-h-screen p-4">
     <div class="max-w-3xl mx-auto py-6">
         
-        <!-- Banner Image with Secret Click Trigger (Tap 5 times) -->
         <div class="mb-3">
             <img id="bannerImg" src="https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg" alt="Apk Layer Banner" class="w-full h-32 object-cover rounded-2xl border emerald-border shadow-lg cursor-pointer select-none">
         </div>
 
-        <!-- Disclaimer Box -->
         <div class="mb-6 p-3 bg-slate-900/90 border emerald-border rounded-xl text-[11px] text-slate-400 leading-relaxed">
             <strong class="text-amber-400">Disclaimer:</strong> If any company, developer, or copyright holder has any issue with any app listed on this platform, please contact us directly at <span class="text-emerald-400 font-mono">apklayer@gmail.com</span> to request immediate removal, rather than issuing copyright strikes or takedowns to Internet Archive.
         </div>
@@ -51,10 +47,13 @@
             <input type="text" id="search" placeholder="Search global apps by name..." onkeyup="filterApps()" 
                 class="w-full p-4 rounded-xl bg-slate-900 border emerald-border text-white focus:outline-none mb-6 text-sm">
 
-            <div id="loadingText" class="text-center py-10 text-slate-400 text-sm">Fetching apps from worldwide server...</div>
-            <div id="app-grid" class="grid grid-cols-1 gap-3">
-                <!-- Apps will load here -->
+            <!-- Yeh debugging box screen par direct status dikhayega -->
+            <div id="debugBox" class="mb-4 p-3 bg-slate-900 border border-yellow-500/30 rounded-xl text-xs text-yellow-300 font-mono">
+                Status: Connecting to Firebase...
             </div>
+
+            <div id="loadingText" class="text-center py-10 text-slate-400 text-sm">Fetching apps from worldwide server...</div>
+            <div id="app-grid" class="grid grid-cols-1 gap-3"></div>
         </div>
 
         <!-- App Details / Download View -->
@@ -69,24 +68,19 @@
             </div>
             <div id="app-detail-content" class="bg-slate-900 border emerald-border p-6 rounded-3xl mb-6 shadow-xl"></div>
 
-            <!-- Admolo Interstitial Ad Unit triggered on download page -->
             <div class="my-4 flex justify-center">
                 <div class="admoloInterstitial"
                 data-publisher="eyJpdiI6IlVraWFMUlF6eVNiQXdvUTJDbVc5TXc9PSIsInZhbHVlIjoiV29zbTlFWUFJTnhqV3QwNTZSRzc2UT09IiwibWFjIjoiZjY1ZWU3ZDVjYmQxMzUxY2I5N2U2OTI5NzY1NTI3YzI0NTcyYjVlNjE3MzQ4MTZjZWQ4OGM1YTEwYWZmOTliZSIsInRhZyI6IiJ9"
                 data-adsize="interstitial"></div>
             </div>
 
-            <!-- Related Apps Section -->
             <div class="mt-8">
                 <h3 class="text-xs font-bold text-amber-400/90 mb-4 uppercase tracking-wider">Related Apps</h3>
-                <div id="related-apps-grid" class="grid grid-cols-1 gap-3">
-                    <!-- Related apps will load here -->
-                </div>
+                <div id="related-apps-grid" class="grid grid-cols-1 gap-3"></div>
             </div>
         </div>
     </div>
 
-    <!-- Admolo Script loaded safely at the bottom -->
     <script class="admoloScript" src="https://cdn.admolo.com/assets/ads/ad.js" async></script>
 
     <script>
@@ -119,26 +113,31 @@
             }
         }
 
-        // Bulletproof Fetch with 6 Seconds Timeout to avoid infinite hanging
         async function initStore() {
             const loadingText = document.getElementById('loadingText');
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 6000); // 6 sec timeout
-
+            const debugBox = document.getElementById('debugBox');
+            
             try {
-                const res = await fetch(`${FIREBASE_DB_URL}.json`, { signal: controller.signal });
-                clearTimeout(timeoutId);
+                debugBox.innerText = "Fetching: " + FIREBASE_DB_URL + ".json";
+                const res = await fetch(`${FIREBASE_DB_URL}.json`);
                 
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data) {
-                        allApps = Object.entries(data).map(([key, val]) => ({ ...val, fbKey: key })).reverse();
-                    }
+                if (!res.ok) {
+                    throw new Error("HTTP Error: " + res.status);
+                }
+                
+                const data = await res.json();
+                debugBox.innerText = "Response Data: " + JSON.stringify(data);
+
+                if (data) {
+                    allApps = Object.entries(data).map(([key, val]) => ({ ...val, fbKey: key })).reverse();
+                } else {
+                    debugBox.innerText = "⚠️ Firebase returned null (Database is empty at /apps)";
                 }
             } catch(e) {
-                console.warn("Network request failed or timed out, using fallback.", e);
+                debugBox.innerText = "❌ Error: " + e.message;
+                console.error(e);
             } finally {
-                if (loadingText) loadingText.remove(); // Completely clear loading element
+                if (loadingText) loadingText.remove();
             }
 
             displayApps(allApps);
@@ -150,7 +149,7 @@
             if(!grid) return;
             
             if(apps.length === 0) {
-                grid.innerHTML = '<div class="p-6 bg-slate-900 border emerald-border rounded-2xl text-center"><p class="text-slate-400 text-xs mb-2">No apps found or connection slow.</p><button onclick="location.reload()" class="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl">Retry Loading</button></div>';
+                grid.innerHTML = '<div class="p-6 bg-slate-900 border emerald-border rounded-2xl text-center"><p class="text-slate-400 text-xs mb-2">No apps in list. Check Debug Box above.</p><button onclick="location.reload()" class="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl">Reload</button></div>';
                 return;
             }
             grid.innerHTML = apps.map(app => `
@@ -174,20 +173,17 @@
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
             let webUrl = "https://apklayer.sbs/#app=" + appId;
-            let shareText = `Download ${appName} on ApkLayer!`;
-
             if (navigator.share) {
-                navigator.share({ title: appName, text: shareText, url: webUrl }).catch(() => {});
+                navigator.share({ title: appName, text: `Download ${appName} on ApkLayer!`, url: webUrl }).catch(() => {});
             } else {
                 navigator.clipboard.writeText(webUrl);
-                alert(`Link copied for ${appName}:\n${webUrl}`);
+                alert(`Link copied for ${appName}`);
             }
         }
 
         async function deleteApp(fbKey, appName) {
             const pass = prompt(`Confirm deletion for "${appName}"?\nEnter password (9522):`);
             if (pass !== "9522") return;
-
             try {
                 const res = await fetch(`${FIREBASE_DB_URL}/${fbKey}.json`, { method: 'DELETE' });
                 if (res.ok) {
@@ -195,7 +191,7 @@
                     allApps = allApps.filter(a => (a.fbKey || a.id) !== fbKey);
                     displayApps(allApps);
                 }
-            } catch (err) { alert("❌ Error: " + err.message); }
+            } catch (err) { alert("❌ Error"); }
         }
 
         function filterApps() {
@@ -211,39 +207,30 @@
 
         function updateMetaTags(app) {
             if (!app) return;
-            document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
-            document.getElementById('metaTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
-            document.getElementById('metaDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
+            document.getElementById('pageTitle').innerText = `${app.appName} - ApkLayer`;
+            document.getElementById('metaTitle').setAttribute('content', `${app.appName} - ApkLayer`);
+            document.getElementById('metaDesc').setAttribute('content', app.description || '');
             document.getElementById('metaImage').setAttribute('content', app.logoUrl);
-            document.getElementById('twitterTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
-            document.getElementById('twitterDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
-            document.getElementById('twitterImage').setAttribute('content', app.logoUrl);
         }
 
         function renderDetail(appId) {
             let app = allApps.find(a => a.id == appId);
             if (!app) {
-                resetMetaTags();
-                document.getElementById('home-view').classList.remove('hidden');
-                document.getElementById('detail-view').classList.add('hidden');
-                displayApps(allApps);
+                goBack();
                 return;
             }
-
             updateMetaTags(app);
-
             document.getElementById('home-view').classList.add('hidden');
             document.getElementById('detail-view').classList.remove('hidden');
-
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
             let screenshotsHtml = '';
             if (app.screenshots && Array.isArray(app.screenshots) && app.screenshots.length > 0) {
                 screenshotsHtml = `
                     <div class="mb-6 w-full text-left">
-                        <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3">App Screenshots</h4>
-                        <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
-                            ${app.screenshots.map(sUrl => `<img src="${sUrl}" class="w-36 h-64 object-cover rounded-2xl border emerald-border bg-slate-950 flex-shrink-0 shadow-md">`).join('')}
+                        <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3">Screenshots</h4>
+                        <div class="flex gap-3 overflow-x-auto pb-2">
+                            ${app.screenshots.map(sUrl => `<img src="${sUrl}" class="w-36 h-64 object-cover rounded-2xl border emerald-border bg-slate-950 flex-shrink-0">`).join('')}
                         </div>
                     </div>
                 `;
@@ -255,48 +242,33 @@
                     <h2 class="text-2xl font-bold text-white mb-1">${app.appName}</h2>
                     <p class="text-xs text-emerald-400 font-mono mb-2">${app.packageName || ''}</p>
                     <p class="text-xs text-slate-300 mb-6 max-w-sm leading-relaxed">${app.description || ''}</p>
-                    
-                    <div class="grid grid-cols-2 gap-4 w-full bg-slate-950 p-4 rounded-2xl border emerald-border mb-6 text-left text-xs shadow-inner">
-                        <div><span class="text-slate-500 block mb-0.5">Version</span> <strong class="text-amber-300">${app.version || '1.0'}</strong></div>
-                        <div><span class="text-slate-500 block mb-0.5">File Size</span> <strong class="text-amber-300">${app.size || 'N/A'}</strong></div>
+                    <div class="grid grid-cols-2 gap-4 w-full bg-slate-950 p-4 rounded-2xl border emerald-border mb-6 text-left text-xs">
+                        <div><span class="text-slate-500 block">Version</span> <strong class="text-amber-300">${app.version || '1.0'}</strong></div>
+                        <div><span class="text-slate-500 block">Size</span> <strong class="text-amber-300">${app.size || 'N/A'}</strong></div>
                     </div>
-
                     ${screenshotsHtml}
-
-                    <button id="downloadBtn" onclick="startDownload('${app.archiveUrl}')" class="w-full py-4 bg-gradient-to-r from-emerald-600 to-amber-600 hover:from-emerald-500 hover:to-amber-500 rounded-2xl font-extrabold text-sm transition shadow-lg shadow-emerald-900/30 text-white cursor-pointer">
-                        Download APK
-                    </button>
+                    <button id="downloadBtn" onclick="startDownload('${app.archiveUrl}')" class="w-full py-4 bg-gradient-to-r from-emerald-600 to-amber-600 rounded-2xl font-extrabold text-sm text-white cursor-pointer">Download APK</button>
                 </div>
             `;
 
             let relatedApps = allApps.filter(a => a.id != appId);
             const relatedGrid = document.getElementById('related-apps-grid');
-            
-            if (relatedApps.length === 0) {
-                relatedGrid.innerHTML = '<p class="text-xs text-slate-500">No other apps available.</p>';
-            } else {
-                relatedGrid.innerHTML = relatedApps.slice(0, 4).map(rel => `
-                    <div onclick="openApp('${rel.id}')" class="flex items-center justify-between p-3.5 bg-slate-900 hover:bg-slate-900/80 rounded-2xl border emerald-border cursor-pointer transition shadow-md">
+            relatedGrid.innerHTML = relatedApps.length === 0 ? '<p class="text-xs text-slate-500">No other apps.</p>' : 
+                relatedApps.slice(0, 4).map(rel => `
+                    <div onclick="openApp('${rel.id}')" class="flex items-center justify-between p-3.5 bg-slate-900 rounded-2xl border emerald-border cursor-pointer">
                         <div class="flex items-center gap-3">
                             <img src="${rel.logoUrl}" class="w-11 h-11 rounded-xl object-cover bg-slate-950 border emerald-border">
-                            <div>
-                                <h4 class="text-sm font-bold text-slate-200">${rel.appName}</h4>
-                                <p class="text-[11px] text-amber-300/80">Ver: ${rel.version || '1.0'}</p>
-                            </div>
+                            <div><h4 class="text-sm font-bold text-slate-200">${rel.appName}</h4><p class="text-[11px] text-amber-300">Ver: ${rel.version || '1.0'}</p></div>
                         </div>
                         <span class="text-xs text-emerald-400 font-bold px-3 py-1.5 bg-emerald-600/10 border border-emerald-500/20 rounded-xl">View</span>
                     </div>
                 `).join('');
-            }
         }
 
-        // 10 Seconds Timer with Ad Integration on Download Click
         function startDownload(url) {
             const btn = document.getElementById('downloadBtn');
             btn.disabled = true;
             let count = 10;
-            btn.innerText = `Preparing download in ${count}s...`;
-            
             let t = setInterval(() => {
                 count--;
                 if(count > 0) {
@@ -305,30 +277,16 @@
                     clearInterval(t);
                     btn.innerText = `Download Starting...`;
                     window.location.href = url;
-                    setTimeout(() => { 
-                        btn.disabled = false; 
-                        btn.innerText = `Download APK`; 
-                    }, 3000);
+                    setTimeout(() => { btn.disabled = false; btn.innerText = `Download APK`; }, 3000);
                 }
             }, 1000);
         }
 
         function goBack() {
             window.location.hash = '';
-            resetMetaTags();
             document.getElementById('detail-view').classList.add('hidden');
             document.getElementById('home-view').classList.remove('hidden');
             displayApps(allApps);
-        }
-
-        function resetMetaTags() {
-            document.getElementById('pageTitle').innerText = "ApkLayer - Free Android App Store";
-            document.getElementById('metaTitle').setAttribute('content', "ApkLayer - Free Android App Store");
-            document.getElementById('metaDesc').setAttribute('content', "Download trusted Android apps and games safely on ApkLayer.");
-            document.getElementById('metaImage').setAttribute('content', "https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg");
-            document.getElementById('twitterTitle').setAttribute('content', "ApkLayer - Free Android App Store");
-            document.getElementById('twitterDesc').setAttribute('content', "Download trusted Android apps and games safely on ApkLayer.");
-            document.getElementById('twitterImage').setAttribute('content', "https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg");
         }
 
         function checkRoute() {
@@ -336,11 +294,8 @@
             if (hash.includes('app=')) {
                 const match = hash.match(/app=([^&]+)/);
                 if (match) {
-                    if (allApps.length > 0) {
-                        renderDetail(match[1]);
-                    } else {
-                        setTimeout(() => renderDetail(match[1]), 500);
-                    }
+                    if (allApps.length > 0) renderDetail(match[1]);
+                    else setTimeout(() => renderDetail(match[1]), 500);
                 }
             }
         }
