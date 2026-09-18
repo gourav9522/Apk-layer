@@ -75,7 +75,7 @@
                 </button>
             </div>
             
-            <!-- Ad Container Added Here -->
+            <!-- Ad Container -->
             <div id="adContainer" class="mb-6 w-full flex justify-center"></div>
 
             <div id="app-detail-content" class="bg-slate-900 border emerald-border p-6 rounded-3xl mb-6 shadow-xl"></div>
@@ -127,7 +127,14 @@
                 if (res.ok) {
                     const data = await res.json();
                     if (data) {
-                        allApps = Object.entries(data).map(([key, val]) => ({ ...val, fbKey: key })).reverse();
+                        allApps = Object.entries(data).map(([key, val]) => {
+                            return { 
+                                appName: "Unknown App",
+                                version: "1.0",
+                                ...val, 
+                                fbKey: key 
+                            };
+                        }).reverse();
                     }
                 }
             } catch(e) {
@@ -251,7 +258,7 @@
 
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
-            // Render Ad Safely
+            // Ad Rendering Safely with Script Execution
             const adContainer = document.getElementById('adContainer');
             if (app.adTag) {
                 adContainer.innerHTML = app.adTag;
@@ -349,7 +356,7 @@
             document.getElementById('metaTitle').setAttribute('content', "ApkLayer - Free Android App Store");
             document.getElementById('metaDesc').setAttribute('content', "Download trusted Android apps and games safely on ApkLayer.");
             document.getElementById('metaImage').setAttribute('content', "https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg");
-            document.getElementById('metaTitle').setAttribute('content', "ApkLayer - Free Android App Store");
+            document.getElementById('twitterTitle').setAttribute('content', "ApkLayer - Free Android App Store");
             document.getElementById('twitterDesc').setAttribute('content', "Download trusted Android apps and games safely on ApkLayer.");
             document.getElementById('twitterImage').setAttribute('content', "https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg");
         }
