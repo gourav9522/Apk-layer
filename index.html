@@ -86,9 +86,6 @@
         </div>
     </div>
 
-    <!-- ADMOLLO MAIN SCRIPT (Placed right before body end to prevent errors) -->
-    <script class="admoloScript" src="https://cdn.admolo.com/assets/ads/ad.js" async></script>
-
     <script>
         const FIREBASE_DB_URL = "https://apk-layer-default-rtdb.firebaseio.com/apps";
         let allApps = [];
@@ -127,7 +124,6 @@
                     const data = await res.json();
                     if (data) {
                         allApps = Object.entries(data).map(([key, val]) => ({ ...val, fbKey: key })).reverse();
-                        console.log("Apps loaded successfully:", allApps.length);
                     }
                 }
             } catch(e) {
@@ -160,7 +156,7 @@
                             Share
                         </button>
                         ${isAdminUnlocked ? `
-                            <button onclick="deleteApp('${app.fbKey \vert{}\vert{} app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
+                            <button onclick="deleteApp('${app.fbKey || app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
                                 Delete
                             </button>
                         ` : ''}
@@ -172,6 +168,7 @@
 
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
+            // Updated with your permanent domain apklayer.sbs
             let webUrl = "https://apklayer.sbs/#app=" + appId;
             let shareText = `Download ${appName} on ApkLayer!`;
 
@@ -225,10 +222,12 @@
             if (!app) return;
             document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
             
+            // Update Open Graph (WhatsApp, Facebook, Telegram)
             document.getElementById('metaTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('metaDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('metaImage').setAttribute('content', app.logoUrl);
 
+            // Update Twitter Cards
             document.getElementById('twitterTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('twitterDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('twitterImage').setAttribute('content', app.logoUrl);
@@ -244,6 +243,7 @@
                 return;
             }
 
+            // Dynamically update meta tags for social sharing preview
             updateMetaTags(app);
 
             document.getElementById('home-view').classList.add('hidden');
@@ -251,9 +251,7 @@
 
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
-            // Console log tracking for Ad container initialization
-            console.log("Rendering details for app:", app.appName, "| Initializing Ad Container...");
-
+            // Render Screenshots HTML if available
             let screenshotsHtml = '';
             if (app.screenshots && Array.isArray(app.screenshots) && app.screenshots.length > 0) {
                 screenshotsHtml = `
@@ -280,14 +278,6 @@
 
                     ${screenshotsHtml}
 
-                    <!-- AUTOMATIC ADMOLLO AD CONTAINER -->
-                    <div class="my-4 flex justify-center w-full">
-                        <div class="admoloInterstitial"
-                        data-publisher="eyJpdiI6IlVraWFMUlF6eVNiQXdvUTJDbVc5TXc9PSIsInZhbHVlIjoiV29zbTlFWUFJTnhqV3QwNTZSRzc2UT09IiwibWFjIjoiZjY1ZWU3ZDVjYmQxMzUxY2I5N2U2OTI5NzY1NTI3YzI0NTcyYjVlNjE3MzQ4MTZjZWQ4OGM1YTEwYWZmOTliZSIsInRhZyI6IiJ9"
-                        data-adsize="interstitial"></div>
-                    </div>
-
-                    <!-- DOWNLOAD BUTTON WITH 10s TIMER -->
                     <button id="downloadBtn" onclick="startDownload('${app.archiveUrl}')" class="w-full py-4 bg-gradient-to-r from-emerald-600 to-amber-600 hover:from-emerald-500 hover:to-amber-500 rounded-2xl font-extrabold text-sm transition shadow-lg shadow-emerald-900/30 text-white cursor-pointer">
                         Download APK
                     </button>
@@ -318,10 +308,8 @@
         function startDownload(url) {
             const btn = document.getElementById('downloadBtn');
             btn.disabled = true;
-            let count = 10; // 10 seconds timer
-            console.log("Download timer started (10 seconds)...");
+            let count = 5;
             btn.innerText = `Preparing download in ${count}s...`;
-            
             let t = setInterval(() => {
                 count--;
                 if(count > 0) {
@@ -329,7 +317,6 @@
                 } else {
                     clearInterval(t);
                     btn.innerText = `Download Starting...`;
-                    console.log("Redirecting to download link:", url);
                     window.location.href = url;
                     setTimeout(() => { btn.disabled = false; btn.innerText = `Download APK`; }, 3000);
                 }
