@@ -74,10 +74,6 @@
                     📤 Share App
                 </button>
             </div>
-            
-            <!-- Ad Container -->
-            <div id="adContainer" class="mb-6 w-full flex justify-center"></div>
-
             <div id="app-detail-content" class="bg-slate-900 border emerald-border p-6 rounded-3xl mb-6 shadow-xl"></div>
 
             <!-- Related Apps Section -->
@@ -127,14 +123,7 @@
                 if (res.ok) {
                     const data = await res.json();
                     if (data) {
-                        allApps = Object.entries(data).map(([key, val]) => {
-                            return { 
-                                appName: "Unknown App",
-                                version: "1.0",
-                                ...val, 
-                                fbKey: key 
-                            };
-                        }).reverse();
+                        allApps = Object.entries(data).map(([key, val]) => ({ ...val, fbKey: key })).reverse();
                     }
                 }
             } catch(e) {
@@ -167,7 +156,7 @@
                             Share
                         </button>
                         ${isAdminUnlocked ? `
-                            <button onclick="deleteApp('${app.fbKey \vert{}\vert{} app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
+                            <button onclick="deleteApp('${app.fbKey || app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
                                 Delete
                             </button>
                         ` : ''}
@@ -179,6 +168,7 @@
 
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
+            // Updated with your permanent domain apklayer.sbs
             let webUrl = "https://apklayer.sbs/#app=" + appId;
             let shareText = `Download ${appName} on ApkLayer!`;
 
@@ -232,10 +222,12 @@
             if (!app) return;
             document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
             
+            // Update Open Graph (WhatsApp, Facebook, Telegram)
             document.getElementById('metaTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('metaDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('metaImage').setAttribute('content', app.logoUrl);
 
+            // Update Twitter Cards
             document.getElementById('twitterTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('twitterDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('twitterImage').setAttribute('content', app.logoUrl);
@@ -251,6 +243,7 @@
                 return;
             }
 
+            // Dynamically update meta tags for social sharing preview
             updateMetaTags(app);
 
             document.getElementById('home-view').classList.add('hidden');
@@ -258,20 +251,7 @@
 
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
-            // Ad Rendering Safely with Script Execution
-            const adContainer = document.getElementById('adContainer');
-            if (app.adTag) {
-                adContainer.innerHTML = app.adTag;
-                Array.from(adContainer.querySelectorAll("script")).forEach(oldScript => {
-                    const newScript = document.createElement("script");
-                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                    oldScript.parentNode.replaceChild(newScript, oldScript);
-                });
-            } else {
-                adContainer.innerHTML = '';
-            }
-
+            // Render Screenshots HTML if available
             let screenshotsHtml = '';
             if (app.screenshots && Array.isArray(app.screenshots) && app.screenshots.length > 0) {
                 screenshotsHtml = `
@@ -328,7 +308,7 @@
         function startDownload(url) {
             const btn = document.getElementById('downloadBtn');
             btn.disabled = true;
-            let count = 10;
+            let count = 5;
             btn.innerText = `Preparing download in ${count}s...`;
             let t = setInterval(() => {
                 count--;
