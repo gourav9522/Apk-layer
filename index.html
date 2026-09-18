@@ -3,70 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitle">ApkLayer - Free Android App Store</title>
-    
-    <meta id="metaTitle" property="og:title" content="ApkLayer - Free Android App Store">
-    <meta id="metaDesc" property="og:description" content="Download trusted Android apps and games safely on ApkLayer.">
-    <meta id="metaImage" property="og:image" content="https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg">
-    
-    <meta name="twitter:card" content="summary_large_image">
-    <meta id="twitterTitle" name="twitter:title" content="ApkLayer - Free Android App Store">
-    <meta id="twitterDesc" name="twitter:description" content="Download trusted Android apps and games safely on ApkLayer.">
-    <meta id="twitterImage" name="twitter:image" content="https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg">
-
+    <title>ApkLayer - Free Android App Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .gold-glow { text-shadow: 0 0 15px rgba(234, 179, 8, 0.4); }
         .emerald-border { border-color: rgba(16, 185, 129, 0.3); }
-        .emerald-border:focus { border-color: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
     </style>
 </head>
 <body class="bg-slate-950 text-white min-h-screen p-4">
     <div class="max-w-3xl mx-auto py-6">
         
+        <!-- Banner -->
         <div class="mb-3">
-            <img id="bannerImg" src="https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg" alt="Apk Layer Banner" class="w-full h-32 object-cover rounded-2xl border emerald-border shadow-lg cursor-pointer select-none">
+            <img id="bannerImg" src="https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg" alt="Banner" class="w-full h-32 object-cover rounded-2xl border emerald-border shadow-lg cursor-pointer">
         </div>
 
-        <div class="mb-6 p-3 bg-slate-900/90 border emerald-border rounded-xl text-[11px] text-slate-400 leading-relaxed">
-            <strong class="text-amber-400">Disclaimer:</strong> If any company, developer, or copyright holder has any issue with any app listed on this platform, please contact us directly at <span class="text-emerald-400 font-mono">apklayer@gmail.com</span> to request immediate removal, rather than issuing copyright strikes or takedowns to Internet Archive.
+        <!-- Disclaimer -->
+        <div class="mb-6 p-3 bg-slate-900 border emerald-border rounded-xl text-[11px] text-slate-400">
+            <strong class="text-amber-400">Disclaimer:</strong> For any app issues or removal, contact <span class="text-emerald-400">apklayer@gmail.com</span>.
         </div>
 
+        <!-- Header -->
         <div class="flex justify-between items-center mb-6">
             <div>
                 <h1 class="text-3xl font-extrabold text-emerald-400 gold-glow">ApkLayer</h1>
-                <p class="text-xs text-amber-300/80 font-medium">Trusted Global Android App Store</p>
+                <p class="text-xs text-amber-300">Trusted Global Android App Store</p>
             </div>
-            <div class="flex items-center gap-2">
-                <span id="adminBadge" class="hidden px-3 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl text-[10px] font-bold">Admin Unlocked</span>
-            </div>
+            <span id="adminBadge" class="hidden px-3 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl text-[10px] font-bold">Admin Unlocked</span>
         </div>
 
-        <!-- Main Store View -->
+        <!-- Home View -->
         <div id="home-view">
-            <input type="text" id="search" placeholder="Search global apps by name..." onkeyup="filterApps()" 
+            <input type="text" id="search" placeholder="Search apps by name..." onkeyup="filterApps()" 
                 class="w-full p-4 rounded-xl bg-slate-900 border emerald-border text-white focus:outline-none mb-6 text-sm">
 
             <div id="debugBox" class="mb-4 p-3 bg-slate-900 border border-emerald-500/30 rounded-xl text-xs text-emerald-300 font-mono">
-                Status: Ready
+                Status: Loading Apps...
             </div>
 
-            <div id="loadingText" class="text-center py-6 text-slate-400 text-sm">Fetching apps from worldwide server...</div>
             <div id="app-grid" class="grid grid-cols-1 gap-3"></div>
         </div>
 
-        <!-- App Details / Download View -->
+        <!-- Detail View -->
         <div id="detail-view" class="hidden">
-            <div class="flex justify-between items-center mb-6">
-                <button onclick="goBack()" class="px-4 py-2.5 bg-slate-900 border emerald-border rounded-xl text-xs font-bold text-slate-300 hover:text-white flex items-center gap-2 transition">
-                    ← Back to Store
-                </button>
-                <button id="shareDetailBtn" class="px-4 py-2.5 bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-bold hover:bg-emerald-600 hover:text-white transition flex items-center gap-1.5">
-                    📤 Share App
-                </button>
-            </div>
-            <div id="app-detail-content" class="bg-slate-900 border emerald-border p-6 rounded-3xl mb-6 shadow-xl"></div>
+            <button onclick="goBack()" class="mb-6 px-4 py-2.5 bg-slate-900 border emerald-border rounded-xl text-xs font-bold text-slate-300">← Back to Store</button>
+            
+            <div id="app-detail-content" class="bg-slate-900 border emerald-border p-6 rounded-3xl mb-6"></div>
 
+            <!-- ADMOLLO INTERSTITIAL AD CONTAINER -->
             <div class="my-4 flex justify-center">
                 <div class="admoloInterstitial"
                 data-publisher="eyJpdiI6IlVraWFMUlF6eVNiQXdvUTJDbVc5TXc9PSIsInZhbHVlIjoiV29zbTlFWUFJTnhqV3QwNTZSRzc2UT09IiwibWFjIjoiZjY1ZWU3ZDVjYmQxMzUxY2I5N2U2OTI5NzY1NTI3YzI0NTcyYjVlNjE3MzQ4MTZjZWQ4OGM1YTEwYWZmOTliZSIsInRhZyI6IiJ9"
@@ -74,60 +58,46 @@
             </div>
 
             <div class="mt-8">
-                <h3 class="text-xs font-bold text-amber-400/90 mb-4 uppercase tracking-wider">Related Apps</h3>
+                <h3 class="text-xs font-bold text-amber-400 mb-4 uppercase">Related Apps</h3>
                 <div id="related-apps-grid" class="grid grid-cols-1 gap-3"></div>
             </div>
         </div>
+
     </div>
 
+    <!-- ADMOLLO MAIN SCRIPT (Hamesha body ke bilkul ant me lagani hai taaki error na aaye) -->
     <script class="admoloScript" src="https://cdn.admolo.com/assets/ads/ad.js" async></script>
 
+    <!-- App Logic Script -->
     <script>
         const FIREBASE_DB_URL = "https://apk-layer-default-rtdb.firebaseio.com/apps";
         let allApps = [];
         let isAdminUnlocked = false;
         let bannerClicks = 0;
-        let clickTimer = null;
 
+        // Admin Unlock via 5 clicks on banner (Password: 9522)
         document.getElementById('bannerImg').addEventListener('click', () => {
             bannerClicks++;
-            clearTimeout(clickTimer);
             if (bannerClicks >= 5) {
                 bannerClicks = 0;
-                promptAdminPassword();
-            } else {
-                clickTimer = setTimeout(() => { bannerClicks = 0; }, 1000);
+                let pass = prompt("Enter Admin Password:");
+                if (pass === "9522") {
+                    isAdminUnlocked = true;
+                    document.getElementById('adminBadge').classList.remove('hidden');
+                    alert("Admin Unlocked!");
+                    displayApps(allApps);
+                }
             }
         });
 
-        function promptAdminPassword() {
-            const pass = prompt("Enter Admin Password to manage/delete apps:");
-            if (pass === "9522") {
-                isAdminUnlocked = true;
-                document.getElementById('adminBadge').classList.remove('hidden');
-                alert("🔓 Admin mode unlocked!");
-                displayApps(allApps);
-            } else if (pass !== null) {
-                alert("❌ Wrong password!");
-            }
-        }
-
-        // Direct Promise-based fetch to bypass any script blocking
+        // Load Apps from Firebase
         function initStore() {
-            const loadingText = document.getElementById('loadingText');
             const debugBox = document.getElementById('debugBox');
-            
-            debugBox.innerText = "Status: Connecting to Firebase...";
-
             fetch(FIREBASE_DB_URL + ".json")
-                .then(response => {
-                    if (!response.ok) throw new Error("HTTP error " + response.status);
-                    return response.json();
-                })
+                .then(res => res.json())
                 .then(data => {
-                    if (loadingText) loadingText.remove();
                     if (data) {
-                        debugBox.innerText = "Status: Connected! Apps Loaded.";
+                        debugBox.innerText = "Status: Connected Successfully!";
                         allApps = Object.entries(data).map(([key, val]) => ({ ...val, fbKey: key })).reverse();
                     } else {
                         debugBox.innerText = "Status: Connected, but Database is Empty.";
@@ -135,167 +105,78 @@
                     displayApps(allApps);
                     checkRoute();
                 })
-                .catch(error => {
-                    if (loadingText) loadingText.remove();
-                    debugBox.innerText = "Status Error: " + error.message;
-                    displayApps([]);
+                .catch(err => {
+                    debugBox.innerText = "Error loading apps: " + err.message;
                 });
         }
 
         function displayApps(apps) {
             const grid = document.getElementById('app-grid');
-            if(!grid) return;
-            
-            if(apps.length === 0) {
-                grid.innerHTML = '<div class="p-6 bg-slate-900 border emerald-border rounded-2xl text-center"><p class="text-slate-400 text-xs mb-2">No apps found or database empty.</p><button onclick="location.reload()" class="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl">Reload Page</button></div>';
+            if (apps.length === 0) {
+                grid.innerHTML = '<div class="p-4 bg-slate-900 border emerald-border rounded-xl text-center text-xs text-slate-400">No apps found.</div>';
                 return;
             }
             grid.innerHTML = apps.map(app => `
-                <div class="flex items-center justify-between p-4 bg-slate-900 hover:bg-slate-900/80 rounded-2xl border emerald-border transition shadow-md">
+                <div class="flex items-center justify-between p-4 bg-slate-900 rounded-2xl border emerald-border">
                     <div onclick="openApp('${app.id}')" class="flex items-center gap-4 flex-1 cursor-pointer">
-                        <img src="${app.logoUrl}" alt="${app.appName}" class="w-14 h-14 rounded-2xl object-cover bg-slate-950 border emerald-border">
+                        <img src="${app.logoUrl}" class="w-14 h-14 rounded-2xl object-cover bg-slate-950 border emerald-border">
                         <div>
                             <h2 class="text-base font-bold text-slate-100">${app.appName}</h2>
-                            <p class="text-xs text-amber-300/80 mt-0.5">Ver: ${app.version || '1.0'} • ${app.size || 'APK'}</p>
+                            <p class="text-xs text-amber-300">Ver: ${app.version || '1.0'} • ${app.size || 'APK'}</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="shareApp('${app.id}', '${app.appName}', event)" class="px-3 py-2 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-xl text-xs font-bold border border-emerald-500/30 transition">Share</button>
-                        ${isAdminUnlocked ? `<button onclick="deleteApp('${app.fbKey \vert{}\vert{} app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">Delete</button>` : ''}
-                        <span onclick="openApp('${app.id}')" class="px-4 py-2 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-xl text-xs font-bold border border-emerald-500/30 cursor-pointer transition">View</span>
+                    <div class="flex gap-2">
+                        ${isAdminUnlocked ? `<button onclick="deleteApp('${app.fbKey}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 rounded-xl text-xs font-bold border border-red-500/30">Delete</button>` : ''}
+                        <button onclick="openApp('${app.id}')" class="px-4 py-2 bg-emerald-600/20 text-emerald-400 rounded-xl text-xs font-bold border border-emerald-500/30">View</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        function shareApp(appId, appName, event) {
-            if(event) event.stopPropagation();
-            let webUrl = "https://apklayer.sbs/#app=" + appId;
-            if (navigator.share) {
-                navigator.share({ title: appName, text: `Download ${appName} on ApkLayer!`, url: webUrl }).catch(() => {});
-            } else {
-                navigator.clipboard.writeText(webUrl);
-                alert(`Link copied for ${appName}`);
-            }
-        }
-
-        function deleteApp(fbKey, appName) {
-            const pass = prompt(`Confirm deletion for "${appName}"?\nEnter password (9522):`);
-            if (pass !== "9522") return;
+        function deleteApp(fbKey, name) {
+            if (prompt("Enter password to delete (9522):") !== "9522") return;
             fetch(`${FIREBASE_DB_URL}/${fbKey}.json`, { method: 'DELETE' })
-                .then(res => {
-                    if (res.ok) {
-                        alert(`✅ Deleted successfully!`);
-                        allApps = allApps.filter(a => (a.fbKey || a.id) !== fbKey);
-                        displayApps(allApps);
-                    }
-                })
-                .catch(err => alert("❌ Error"));
+                .then(res => { if(res.ok) { alert("Deleted!"); location.reload(); } });
         }
 
         function filterApps() {
-            let query = document.getElementById('search').value.toLowerCase();
-            let filtered = allApps.filter(app => app.appName.toLowerCase().includes(query));
-            displayApps(filtered);
+            let q = document.getElementById('search').value.toLowerCase();
+            displayApps(allApps.filter(a => a.appName.toLowerCase().includes(q)));
         }
 
-        function openApp(appId) {
-            window.location.hash = `app=${appId}`;
-            renderDetail(appId);
+        function openApp(id) {
+            window.location.hash = `app=${id}`;
+            renderDetail(id);
         }
 
-        function updateMetaTags(app) {
-            if (!app) return;
-            document.getElementById('pageTitle').innerText = `${app.appName} - ApkLayer`;
-            document.getElementById('metaTitle').setAttribute('content', `${app.appName} - ApkLayer`);
-            document.getElementById('metaDesc').setAttribute('content', app.description || '');
-            document.getElementById('metaImage').setAttribute('content', app.logoUrl);
-        }
-
-        function renderDetail(appId) {
-            let app = allApps.find(a => a.id == appId);
-            if (!app) {
-                goBack();
-                return;
-            }
-            updateMetaTags(app);
+        function renderDetail(id) {
+            let app = allApps.find(a => a.id == id);
+            if (!app) return goBack();
+            
             document.getElementById('home-view').classList.add('hidden');
             document.getElementById('detail-view').classList.remove('hidden');
-            document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
-
-            let screenshotsHtml = '';
-            if (app.screenshots && Array.isArray(app.screenshots) && app.screenshots.length > 0) {
-                screenshotsHtml = `
-                    <div class="mb-6 w-full text-left">
-                        <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3">Screenshots</h4>
-                        <div class="flex gap-3 overflow-x-auto pb-2">
-                            ${app.screenshots.map(sUrl => `<img src="${sUrl}" class="w-36 h-64 object-cover rounded-2xl border emerald-border bg-slate-950 flex-shrink-0">`).join('')}
-                        </div>
-                    </div>
-                `;
-            }
 
             document.getElementById('app-detail-content').innerHTML = `
                 <div class="flex flex-col items-center text-center">
-                    <img src="${app.logoUrl}" class="w-24 h-24 rounded-3xl object-cover bg-slate-950 border emerald-border mb-4 shadow-xl">
-                    <h2 class="text-2xl font-bold text-white mb-1">${app.appName}</h2>
-                    <p class="text-xs text-emerald-400 font-mono mb-2">${app.packageName || ''}</p>
-                    <p class="text-xs text-slate-300 mb-6 max-w-sm leading-relaxed">${app.description || ''}</p>
-                    <div class="grid grid-cols-2 gap-4 w-full bg-slate-950 p-4 rounded-2xl border emerald-border mb-6 text-left text-xs">
-                        <div><span class="text-slate-500 block">Version</span> <strong class="text-amber-300">${app.version || '1.0'}</strong></div>
-                        <div><span class="text-slate-500 block">Size</span> <strong class="text-amber-300">${app.size || 'N/A'}</strong></div>
-                    </div>
-                    ${screenshotsHtml}
-                    <button id="downloadBtn" onclick="startDownload('${app.archiveUrl}')" class="w-full py-4 bg-gradient-to-r from-emerald-600 to-amber-600 rounded-2xl font-extrabold text-sm text-white cursor-pointer">Download APK</button>
+                    <img src="${app.logoUrl}" class="w-24 h-24 rounded-3xl object-cover bg-slate-950 border emerald-border mb-4">
+                    <h2 class="text-2xl font-bold mb-1">${app.appName}</h2>
+                    <p class="text-xs text-slate-300 mb-6">${app.description || ''}</p>
+                    <a href="${app.archiveUrl}" class="w-full py-4 bg-emerald-600 rounded-2xl font-bold text-sm text-center text-white">Download APK</a>
                 </div>
             `;
-
-            let relatedApps = allApps.filter(a => a.id != appId);
-            const relatedGrid = document.getElementById('related-apps-grid');
-            relatedGrid.innerHTML = relatedApps.length === 0 ? '<p class="text-xs text-slate-500">No other apps.</p>' : 
-                relatedApps.slice(0, 4).map(rel => `
-                    <div onclick="openApp('${rel.id}')" class="flex items-center justify-between p-3.5 bg-slate-900 rounded-2xl border emerald-border cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <img src="${rel.logoUrl}" class="w-11 h-11 rounded-xl object-cover bg-slate-950 border emerald-border">
-                            <div><h4 class="text-sm font-bold text-slate-200">${rel.appName}</h4><p class="text-[11px] text-amber-300">Ver: ${rel.version || '1.0'}</p></div>
-                        </div>
-                        <span class="text-xs text-emerald-400 font-bold px-3 py-1.5 bg-emerald-600/10 border border-emerald-500/20 rounded-xl">View</span>
-                    </div>
-                `).join('');
-        }
-
-        function startDownload(url) {
-            const btn = document.getElementById('downloadBtn');
-            btn.disabled = true;
-            let count = 10;
-            let t = setInterval(() => {
-                count--;
-                if(count > 0) {
-                    btn.innerText = `Preparing download in ${count}s...`;
-                } else {
-                    clearInterval(t);
-                    btn.innerText = `Download Starting...`;
-                    window.location.href = url;
-                    setTimeout(() => { btn.disabled = false; btn.innerText = `Download APK`; }, 3000);
-                }
-            }, 1000);
         }
 
         function goBack() {
             window.location.hash = '';
             document.getElementById('detail-view').classList.add('hidden');
             document.getElementById('home-view').classList.remove('hidden');
-            displayApps(allApps);
         }
 
         function checkRoute() {
-            const hash = window.location.hash;
-            if (hash.includes('app=')) {
-                const match = hash.match(/app=([^&]+)/);
-                if (match) {
-                    if (allApps.length > 0) renderDetail(match[1]);
-                    else setTimeout(() => renderDetail(match[1]), 500);
-                }
+            if (window.location.hash.includes('app=')) {
+                let id = window.location.hash.split('=')[1];
+                if (allApps.length > 0) renderDetail(id);
+                else setTimeout(() => renderDetail(id), 500);
             }
         }
 
