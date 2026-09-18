@@ -32,19 +32,25 @@
 </head>
 <body class="bg-slate-950 text-white min-h-screen p-4">
     <div class="max-w-3xl mx-auto py-6">
-        <script>
-  atOptions = {
-    'key' : '0a4249e5223ea12cc2ceb33d7db0985a',
-    'format' : 'iframe',
-    'height' : 50,
-    'width' : 320,
-    'params' : {}
-  };
-</script>
-<script src="https://www.highrevenueformat.com/0a4249e5223ea12cc2ceb33d7db0985a/invoke.js"></script>
+        
         <!-- Banner Image with Secret Click Trigger (Tap 5 times) -->
         <div class="mb-3">
             <img id="bannerImg" src="https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg" alt="Apk Layer Banner" class="w-full h-32 object-cover rounded-2xl border emerald-border shadow-lg cursor-pointer select-none">
+        </div>
+
+        <!-- Disclaimer Box -->
+        <div class="mb-6 p-3 bg-slate-900/90 border emerald-border rounded-xl text-[11px] text-slate-400 leading-relaxed">
+            <strong class="text-amber-400">Disclaimer:</strong> If any company, developer, or copyright holder has any issue with any app listed on this platform, please contact us directly at <span class="text-emerald-400 font-mono">apklayer@gmail.com</span> to request immediate removal, rather than issuing copyright strikes or takedowns to Internet Archive.
+        </div>
+
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-extrabold text-emerald-400 gold-glow">ApkLayer</h1>
+                <p class="text-xs text-amber-300/80 font-medium">Trusted Global Android App Store</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="adminBadge" class="hidden px-3 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl text-[10px] font-bold">Admin Unlocked</span>
+            </div>
         </div>
 
         <!-- Main Store View -->
@@ -69,7 +75,7 @@
                 </button>
             </div>
             <div id="app-detail-content" class="bg-slate-900 border emerald-border p-6 rounded-3xl mb-6 shadow-xl"></div>
-            
+
             <!-- Related Apps Section -->
             <div class="mt-8">
                 <h3 class="text-xs font-bold text-amber-400/90 mb-4 uppercase tracking-wider">Related Apps</h3>
@@ -102,6 +108,7 @@
             const pass = prompt("Enter Admin Password to manage/delete apps:");
             if (pass === "9522") {
                 isAdminUnlocked = true;
+                document.getElementById('adminBadge').classList.remove('hidden');
                 alert("🔓 Admin mode unlocked! You can now delete apps.");
                 displayApps(allApps);
             } else if (pass !== null) {
@@ -149,7 +156,7 @@
                             Share
                         </button>
                         ${isAdminUnlocked ? `
-                            <button onclick="deleteApp('${app.fbKey \vert{}\vert{} app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
+                            <button onclick="deleteApp('${app.fbKey || app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
                                 Delete
                             </button>
                         ` : ''}
@@ -161,6 +168,7 @@
 
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
+            // Updated with your permanent domain apklayer.sbs
             let webUrl = "https://apklayer.sbs/#app=" + appId;
             let shareText = `Download ${appName} on ApkLayer!`;
 
@@ -214,10 +222,12 @@
             if (!app) return;
             document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
             
+            // Update Open Graph (WhatsApp, Facebook, Telegram)
             document.getElementById('metaTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('metaDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('metaImage').setAttribute('content', app.logoUrl);
 
+            // Update Twitter Cards
             document.getElementById('twitterTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('twitterDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('twitterImage').setAttribute('content', app.logoUrl);
@@ -233,6 +243,7 @@
                 return;
             }
 
+            // Dynamically update meta tags for social sharing preview
             updateMetaTags(app);
 
             document.getElementById('home-view').classList.add('hidden');
@@ -240,6 +251,7 @@
 
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
+            // Render Screenshots HTML if available
             let screenshotsHtml = '';
             if (app.screenshots && Array.isArray(app.screenshots) && app.screenshots.length > 0) {
                 screenshotsHtml = `
