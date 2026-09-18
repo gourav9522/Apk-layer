@@ -253,6 +253,19 @@
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
             // Render Screenshots HTML if available
+                        const adContainer = document.getElementById('adContainer');
+            if (app.adTag) {
+                adContainer.innerHTML = app.adTag;
+                Array.from(adContainer.querySelectorAll("script")).forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                });
+            } else {
+                adContainer.innerHTML = '';
+            }
+
             let screenshotsHtml = '';
             if (app.screenshots && Array.isArray(app.screenshots) && app.screenshots.length > 0) {
                 screenshotsHtml = `
