@@ -309,7 +309,7 @@
         function startDownload(url) {
             const btn = document.getElementById('downloadBtn');
             btn.disabled = true;
-            let count = 5;
+            let count = 10;
             btn.innerText = `Preparing download in ${count}s...`;
             let t = setInterval(() => {
                 count--;
