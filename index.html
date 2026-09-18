@@ -126,14 +126,19 @@
             const loadingText = document.getElementById('loadingText');
             try {
                 const res = await fetch(`${FIREBASE_DB_URL}.json`);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data) {
-                        allApps = Object.entries(data).map(([key, val]) => ({ ...val, fbKey: key })).reverse();
-                    }
+                if (!res.ok) throw new Error("Server response failed");
+                const data = await res.json();
+                
+                if (data) {
+                    allApps = Object.entries(data).map(([key, val]) => ({ ...val, fbKey: key })).reverse();
+                } else {
+                    allApps = [];
                 }
             } catch(e) {
                 console.error("Error fetching global apps", e);
+                if (loadingText) {
+                    loadingText.innerHTML = '<span class="text-red-400">⚠️ Failed to connect to server. Please check your internet or try again later.</span>';
+                }
             } finally {
                 if (loadingText) loadingText.style.display = 'none';
             }
@@ -144,7 +149,7 @@
 
         function displayApps(apps) {
             const grid = document.getElementById('app-grid');
-            if(apps.length === 0) {
+            if(!apps || apps.length === 0) {
                 grid.innerHTML = '<p class="text-slate-500 text-center py-10">No apps found globally. Upload via Console!</p>';
                 return;
             }
@@ -253,7 +258,6 @@
 
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
-            // Render permanent Ad Tags coming from database for this app
             const adContainer = document.getElementById('adContainer');
             if (app.adTag) {
                 adContainer.innerHTML = app.adTag;
@@ -317,7 +321,7 @@
         function startDownload(url) {
             const btn = document.getElementById('downloadBtn');
             btn.disabled = true;
-            let count = 10; // Timer changed to 10 seconds
+            let count = 10;
             btn.innerText = `Preparing download in ${count}s...`;
             let t = setInterval(() => {
                 count--;
