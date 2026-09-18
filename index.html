@@ -46,8 +46,6 @@
         <div class="mb-3">
             <img id="bannerImg" src="https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg" alt="Apk Layer Banner" class="w-full h-32 object-cover rounded-2xl border emerald-border shadow-lg cursor-pointer select-none">
         </div>
-<script async="async" data-cfasync="false" src="https://pl31396652.profitableratecpmnetwork.com/39b3df06ed53225cbbf280b4c58f9333/invoke.js"></script>
-<div id="container-39b3df06ed53225cbbf280b4c58f9333"></div>
 
         <!-- Main Store View -->
         <div id="home-view">
@@ -72,8 +70,6 @@
             </div>
             <div id="app-detail-content" class="bg-slate-900 border emerald-border p-6 rounded-3xl mb-6 shadow-xl"></div>
             
-<script async="async" data-cfasync="false" src="https://pl31396652.profitableratecpmnetwork.com/39b3df06ed53225cbbf280b4c58f9333/invoke.js"></script>
-<div id="container-39b3df06ed53225cbbf280b4c58f9333"></div>
             <!-- Related Apps Section -->
             <div class="mt-8">
                 <h3 class="text-xs font-bold text-amber-400/90 mb-4 uppercase tracking-wider">Related Apps</h3>
@@ -106,7 +102,6 @@
             const pass = prompt("Enter Admin Password to manage/delete apps:");
             if (pass === "9522") {
                 isAdminUnlocked = true;
-                document.getElementById('adminBadge').classList.remove('hidden');
                 alert("🔓 Admin mode unlocked! You can now delete apps.");
                 displayApps(allApps);
             } else if (pass !== null) {
@@ -154,7 +149,7 @@
                             Share
                         </button>
                         ${isAdminUnlocked ? `
-                            <button onclick="deleteApp('${app.fbKey || app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
+                            <button onclick="deleteApp('${app.fbKey \vert{}\vert{} app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
                                 Delete
                             </button>
                         ` : ''}
@@ -166,7 +161,6 @@
 
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
-            // Updated with your permanent domain apklayer.sbs
             let webUrl = "https://apklayer.sbs/#app=" + appId;
             let shareText = `Download ${appName} on ApkLayer!`;
 
@@ -220,12 +214,10 @@
             if (!app) return;
             document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
             
-            // Update Open Graph (WhatsApp, Facebook, Telegram)
             document.getElementById('metaTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('metaDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('metaImage').setAttribute('content', app.logoUrl);
 
-            // Update Twitter Cards
             document.getElementById('twitterTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('twitterDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('twitterImage').setAttribute('content', app.logoUrl);
@@ -241,7 +233,6 @@
                 return;
             }
 
-            // Dynamically update meta tags for social sharing preview
             updateMetaTags(app);
 
             document.getElementById('home-view').classList.add('hidden');
@@ -249,7 +240,6 @@
 
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
-            // Render Screenshots HTML if available
             let screenshotsHtml = '';
             if (app.screenshots && Array.isArray(app.screenshots) && app.screenshots.length > 0) {
                 screenshotsHtml = `
