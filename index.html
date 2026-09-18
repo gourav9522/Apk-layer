@@ -1,3 +1,4 @@
+<script class="admoloScript" src="https://cdn.admolo.com/assets/ads/ad.js"></script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,9 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">ApkLayer - Free Android App Store</title>
     
-    <!-- Admolo Network Main Publisher Script -->
-    <script class="admoloScript" src="https://cdn.admolo.com/assets/ads/ad.js"></script>
-
     <!-- Dynamic Social Share Meta Tags -->
     <meta id="metaTitle" property="og:title" content="ApkLayer - Free Android App Store">
     <meta id="metaDesc" property="og:description" content="Download trusted Android apps and games safely on ApkLayer.">
@@ -79,9 +77,6 @@
             </div>
             <div id="app-detail-content" class="bg-slate-900 border emerald-border p-6 rounded-3xl mb-6 shadow-xl"></div>
 
-            <!-- Ad Container for Loaded App Tags -->
-            <div id="adContainer" class="my-4 text-center"></div>
-
             <!-- Related Apps Section -->
             <div class="mt-8">
                 <h3 class="text-xs font-bold text-amber-400/90 mb-4 uppercase tracking-wider">Related Apps</h3>
@@ -126,19 +121,14 @@
             const loadingText = document.getElementById('loadingText');
             try {
                 const res = await fetch(`${FIREBASE_DB_URL}.json`);
-                if (!res.ok) throw new Error("Server response failed");
-                const data = await res.json();
-                
-                if (data) {
-                    allApps = Object.entries(data).map(([key, val]) => ({ ...val, fbKey: key })).reverse();
-                } else {
-                    allApps = [];
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data) {
+                        allApps = Object.entries(data).map(([key, val]) => ({ ...val, fbKey: key })).reverse();
+                    }
                 }
             } catch(e) {
                 console.error("Error fetching global apps", e);
-                if (loadingText) {
-                    loadingText.innerHTML = '<span class="text-red-400">⚠️ Failed to connect to server. Please check your internet or try again later.</span>';
-                }
             } finally {
                 if (loadingText) loadingText.style.display = 'none';
             }
@@ -149,7 +139,7 @@
 
         function displayApps(apps) {
             const grid = document.getElementById('app-grid');
-            if(!apps || apps.length === 0) {
+            if(apps.length === 0) {
                 grid.innerHTML = '<p class="text-slate-500 text-center py-10">No apps found globally. Upload via Console!</p>';
                 return;
             }
@@ -167,7 +157,7 @@
                             Share
                         </button>
                         ${isAdminUnlocked ? `
-                            <button onclick="deleteApp('${app.fbKey \vert{}\vert{} app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
+                            <button onclick="deleteApp('${app.fbKey || app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
                                 Delete
                             </button>
                         ` : ''}
@@ -179,6 +169,7 @@
 
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
+            // Updated with your permanent domain apklayer.sbs
             let webUrl = "https://apklayer.sbs/#app=" + appId;
             let shareText = `Download ${appName} on ApkLayer!`;
 
@@ -232,10 +223,12 @@
             if (!app) return;
             document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
             
+            // Update Open Graph (WhatsApp, Facebook, Telegram)
             document.getElementById('metaTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('metaDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('metaImage').setAttribute('content', app.logoUrl);
 
+            // Update Twitter Cards
             document.getElementById('twitterTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('twitterDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('twitterImage').setAttribute('content', app.logoUrl);
@@ -251,6 +244,7 @@
                 return;
             }
 
+            // Dynamically update meta tags for social sharing preview
             updateMetaTags(app);
 
             document.getElementById('home-view').classList.add('hidden');
@@ -258,13 +252,7 @@
 
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
-            const adContainer = document.getElementById('adContainer');
-            if (app.adTag) {
-                adContainer.innerHTML = app.adTag;
-            } else {
-                adContainer.innerHTML = '';
-            }
-
+            // Render Screenshots HTML if available
             let screenshotsHtml = '';
             if (app.screenshots && Array.isArray(app.screenshots) && app.screenshots.length > 0) {
                 screenshotsHtml = `
@@ -321,7 +309,7 @@
         function startDownload(url) {
             const btn = document.getElementById('downloadBtn');
             btn.disabled = true;
-            let count = 10;
+            let count = 5;
             btn.innerText = `Preparing download in ${count}s...`;
             let t = setInterval(() => {
                 count--;
@@ -352,7 +340,6 @@
             document.getElementById('twitterTitle').setAttribute('content', "ApkLayer - Free Android App Store");
             document.getElementById('twitterDesc').setAttribute('content', "Download trusted Android apps and games safely on ApkLayer.");
             document.getElementById('twitterImage').setAttribute('content', "https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg");
-            document.getElementById('adContainer').innerHTML = '';
         }
 
         function checkRoute() {
