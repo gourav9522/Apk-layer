@@ -119,10 +119,16 @@
             }
         }
 
+        // Bulletproof Fetch with 6 Seconds Timeout to avoid infinite hanging
         async function initStore() {
             const loadingText = document.getElementById('loadingText');
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 6000); // 6 sec timeout
+
             try {
-                const res = await fetch(`${FIREBASE_DB_URL}.json`);
+                const res = await fetch(`${FIREBASE_DB_URL}.json`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                
                 if (res.ok) {
                     const data = await res.json();
                     if (data) {
@@ -130,9 +136,9 @@
                     }
                 }
             } catch(e) {
-                console.error("Error fetching apps", e);
+                console.warn("Network request failed or timed out, using fallback.", e);
             } finally {
-                if (loadingText) loadingText.style.display = 'none';
+                if (loadingText) loadingText.remove(); // Completely clear loading element
             }
 
             displayApps(allApps);
@@ -141,8 +147,10 @@
 
         function displayApps(apps) {
             const grid = document.getElementById('app-grid');
+            if(!grid) return;
+            
             if(apps.length === 0) {
-                grid.innerHTML = '<p class="text-slate-500 text-center py-10">No apps found globally. Upload via Console!</p>';
+                grid.innerHTML = '<div class="p-6 bg-slate-900 border emerald-border rounded-2xl text-center"><p class="text-slate-400 text-xs mb-2">No apps found or connection slow.</p><button onclick="location.reload()" class="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl">Retry Loading</button></div>';
                 return;
             }
             grid.innerHTML = apps.map(app => `
@@ -286,7 +294,7 @@
         function startDownload(url) {
             const btn = document.getElementById('downloadBtn');
             btn.disabled = true;
-            let count = 10; // Timer set to 10 seconds as requested
+            let count = 10;
             btn.innerText = `Preparing download in ${count}s...`;
             
             let t = setInterval(() => {
