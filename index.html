@@ -1,4 +1,3 @@
-<script class="admoloScript" src="https://cdn.admolo.com/assets/ads/ad.js"></script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -75,6 +74,10 @@
                     📤 Share App
                 </button>
             </div>
+            
+            <!-- Ad Container Added Here -->
+            <div id="adContainer" class="mb-6 w-full flex justify-center"></div>
+
             <div id="app-detail-content" class="bg-slate-900 border emerald-border p-6 rounded-3xl mb-6 shadow-xl"></div>
 
             <!-- Related Apps Section -->
@@ -157,7 +160,7 @@
                             Share
                         </button>
                         ${isAdminUnlocked ? `
-                            <button onclick="deleteApp('${app.fbKey || app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
+                            <button onclick="deleteApp('${app.fbKey \vert{}\vert{} app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
                                 Delete
                             </button>
                         ` : ''}
@@ -169,7 +172,6 @@
 
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
-            // Updated with your permanent domain apklayer.sbs
             let webUrl = "https://apklayer.sbs/#app=" + appId;
             let shareText = `Download ${appName} on ApkLayer!`;
 
@@ -223,12 +225,10 @@
             if (!app) return;
             document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
             
-            // Update Open Graph (WhatsApp, Facebook, Telegram)
             document.getElementById('metaTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('metaDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('metaImage').setAttribute('content', app.logoUrl);
 
-            // Update Twitter Cards
             document.getElementById('twitterTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('twitterDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('twitterImage').setAttribute('content', app.logoUrl);
@@ -244,7 +244,6 @@
                 return;
             }
 
-            // Dynamically update meta tags for social sharing preview
             updateMetaTags(app);
 
             document.getElementById('home-view').classList.add('hidden');
@@ -252,8 +251,8 @@
 
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
-            // Render Screenshots HTML if available
-                        const adContainer = document.getElementById('adContainer');
+            // Render Ad Safely
+            const adContainer = document.getElementById('adContainer');
             if (app.adTag) {
                 adContainer.innerHTML = app.adTag;
                 Array.from(adContainer.querySelectorAll("script")).forEach(oldScript => {
@@ -350,7 +349,7 @@
             document.getElementById('metaTitle').setAttribute('content', "ApkLayer - Free Android App Store");
             document.getElementById('metaDesc').setAttribute('content', "Download trusted Android apps and games safely on ApkLayer.");
             document.getElementById('metaImage').setAttribute('content', "https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg");
-            document.getElementById('twitterTitle').setAttribute('content', "ApkLayer - Free Android App Store");
+            document.getElementById('metaTitle').setAttribute('content', "ApkLayer - Free Android App Store");
             document.getElementById('twitterDesc').setAttribute('content', "Download trusted Android apps and games safely on ApkLayer.");
             document.getElementById('twitterImage').setAttribute('content', "https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg");
         }
