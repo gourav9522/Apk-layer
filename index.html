@@ -75,14 +75,6 @@
                 </button>
             </div>
             <div id="app-detail-content" class="bg-slate-900 border emerald-border p-6 rounded-3xl mb-6 shadow-xl"></div>
-
-            <!-- Related Apps Section -->
-            <div class="mt-8">
-                <h3 class="text-xs font-bold text-amber-400/90 mb-4 uppercase tracking-wider">Related Apps</h3>
-                <div id="related-apps-grid" class="grid grid-cols-1 gap-3">
-                    <!-- Related apps will load here -->
-                </div>
-            </div>
         </div>
     </div>
 
@@ -156,7 +148,7 @@
                             Share
                         </button>
                         ${isAdminUnlocked ? `
-                            <button onclick="deleteApp('${app.fbKey || app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
+                            <button onclick="deleteApp('${app.fbKey \vert{}\vert{} app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
                                 Delete
                             </button>
                         ` : ''}
@@ -168,7 +160,6 @@
 
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
-            // Updated with your permanent domain apklayer.sbs
             let webUrl = "https://apklayer.sbs/#app=" + appId;
             let shareText = `Download ${appName} on ApkLayer!`;
 
@@ -222,12 +213,10 @@
             if (!app) return;
             document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
             
-            // Update Open Graph (WhatsApp, Facebook, Telegram)
             document.getElementById('metaTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('metaDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('metaImage').setAttribute('content', app.logoUrl);
 
-            // Update Twitter Cards
             document.getElementById('twitterTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('twitterDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('twitterImage').setAttribute('content', app.logoUrl);
@@ -243,7 +232,6 @@
                 return;
             }
 
-            // Dynamically update meta tags for social sharing preview
             updateMetaTags(app);
 
             document.getElementById('home-view').classList.add('hidden');
@@ -251,7 +239,6 @@
 
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
-            // Render Screenshots HTML if available
             let screenshotsHtml = '';
             if (app.screenshots && Array.isArray(app.screenshots) && app.screenshots.length > 0) {
                 screenshotsHtml = `
@@ -283,26 +270,6 @@
                     </button>
                 </div>
             `;
-
-            let relatedApps = allApps.filter(a => a.id != appId);
-            const relatedGrid = document.getElementById('related-apps-grid');
-            
-            if (relatedApps.length === 0) {
-                relatedGrid.innerHTML = '<p class="text-xs text-slate-500">No other apps available.</p>';
-            } else {
-                relatedGrid.innerHTML = relatedApps.slice(0, 4).map(rel => `
-                    <div onclick="openApp('${rel.id}')" class="flex items-center justify-between p-3.5 bg-slate-900 hover:bg-slate-900/80 rounded-2xl border emerald-border cursor-pointer transition shadow-md">
-                        <div class="flex items-center gap-3">
-                            <img src="${rel.logoUrl}" class="w-11 h-11 rounded-xl object-cover bg-slate-950 border emerald-border">
-                            <div>
-                                <h4 class="text-sm font-bold text-slate-200">${rel.appName}</h4>
-                                <p class="text-[11px] text-amber-300/80">Ver: ${rel.version || '1.0'}</p>
-                            </div>
-                        </div>
-                        <span class="text-xs text-emerald-400 font-bold px-3 py-1.5 bg-emerald-600/10 border border-emerald-500/20 rounded-xl">View</span>
-                    </div>
-                `).join('');
-            }
         }
 
         function startDownload(url) {
