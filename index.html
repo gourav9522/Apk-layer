@@ -47,12 +47,11 @@
             <input type="text" id="search" placeholder="Search global apps by name..." onkeyup="filterApps()" 
                 class="w-full p-4 rounded-xl bg-slate-900 border emerald-border text-white focus:outline-none mb-6 text-sm">
 
-            <!-- Yeh debugging box screen par direct status dikhayega -->
             <div id="debugBox" class="mb-4 p-3 bg-slate-900 border border-yellow-500/30 rounded-xl text-xs text-yellow-300 font-mono">
-                Status: Connecting to Firebase...
+                Status: Initializing Script...
             </div>
 
-            <div id="loadingText" class="text-center py-10 text-slate-400 text-sm">Fetching apps from worldwide server...</div>
+            <div id="loadingText" class="text-center py-6 text-slate-400 text-sm">Fetching apps from worldwide server...</div>
             <div id="app-grid" class="grid grid-cols-1 gap-3"></div>
         </div>
 
@@ -118,24 +117,33 @@
             const debugBox = document.getElementById('debugBox');
             
             try {
-                debugBox.innerText = "Fetching: " + FIREBASE_DB_URL + ".json";
-                const res = await fetch(`${FIREBASE_DB_URL}.json`);
+                debugBox.innerText = "Connecting to Firebase URL...";
+                console.log("Fetching from:", FIREBASE_DB_URL);
+                
+                const res = await fetch(`${FIREBASE_DB_URL}.json`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                debugBox.innerText = "HTTP Status: " + res.status;
                 
                 if (!res.ok) {
-                    throw new Error("HTTP Error: " + res.status);
+                    throw new Error("Server returned status " + res.status);
                 }
                 
                 const data = await res.json();
-                debugBox.innerText = "Response Data: " + JSON.stringify(data);
-
+                
                 if (data) {
+                    debugBox.innerText = "Success! Data received.";
                     allApps = Object.entries(data).map(([key, val]) => ({ ...val, fbKey: key })).reverse();
                 } else {
-                    debugBox.innerText = "⚠️ Firebase returned null (Database is empty at /apps)";
+                    debugBox.innerText = "⚠️ Connected, but database path /apps is empty!";
                 }
             } catch(e) {
-                debugBox.innerText = "❌ Error: " + e.message;
-                console.error(e);
+                debugBox.innerText = "❌ Fetch Failed: " + e.message;
+                console.error("Firebase fetch error:", e);
             } finally {
                 if (loadingText) loadingText.remove();
             }
@@ -149,7 +157,7 @@
             if(!grid) return;
             
             if(apps.length === 0) {
-                grid.innerHTML = '<div class="p-6 bg-slate-900 border emerald-border rounded-2xl text-center"><p class="text-slate-400 text-xs mb-2">No apps in list. Check Debug Box above.</p><button onclick="location.reload()" class="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl">Reload</button></div>';
+                grid.innerHTML = '<div class="p-6 bg-slate-900 border emerald-border rounded-2xl text-center"><p class="text-slate-400 text-xs mb-2">No apps found in store database.</p><button onclick="location.reload()" class="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl">Retry Reload</button></div>';
                 return;
             }
             grid.innerHTML = apps.map(app => `
