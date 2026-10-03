@@ -31,11 +31,6 @@
     </style>
 </head>
 <body class="bg-slate-950 text-white min-h-screen p-4">
-    <script>
-        self.options = { "domain": "5gvci.com", "zoneId": 11832820 };
-        self.lary = "";
-        importScripts('https://5gvci.com/act/files/service-worker.min.js?r=sw');
-    </script>
     <div class="max-w-3xl mx-auto py-6">
         <!-- Banner Image with Secret Click Trigger (Tap 5 times) -->
         <div class="mb-3">
@@ -345,7 +340,7 @@
             if (hash.includes('app=')) {
                 const match = hash.match(/app=([^&]+)/);
                 if (match) {
-                    if (allApps.length >0) {
+                    if (allApps.length > 0) {
                         renderDetail(match[1]);
                     } else {
                         setTimeout(() => renderDetail(match[1]), 500);
