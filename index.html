@@ -31,20 +31,12 @@
     </style>
 </head>
 <body class="bg-slate-950 text-white min-h-screen p-4">
+    <script>
+        self.options = { "domain": "5gvci.com", "zoneId": 11832820 };
+        self.lary = "";
+        importScripts('https://5gvci.com/act/files/service-worker.min.js?r=sw');
+    </script>
     <div class="max-w-3xl mx-auto py-6">
-        <script>
-(function(nlti){
-var d = document,
-    s = d.createElement('script'),
-    l = d.currentScript || d.scripts[d.scripts.length - 1];
-s.settings = nlti || {};
-s.src = "\/\/conventionalresponse.com\/b.XRVOsKd\/G\/l_0hYaW\/cD\/SezmE9CuPZ\/Uel-kiPMTzch0TM\/zlk\/xNMojMkRtbNczXQazkO-TFEYzzMPwM";
-s.async = true;
-s.referrerPolicy = 'no-referrer-when-downgrade';
-l.parentNode.insertBefore(s, l);
-})({})
-</script>
-<script src="https://www.highrevenueformat.com/0a4249e5223ea12cc2ceb33d7db0985a/invoke.js"></script>
         <!-- Banner Image with Secret Click Trigger (Tap 5 times) -->
         <div class="mb-3">
             <img id="bannerImg" src="https://archive.org/download/image_2a884fe73/image_2a884fe7~3.jpg" alt="Apk Layer Banner" class="w-full h-32 object-cover rounded-2xl border emerald-border shadow-lg cursor-pointer select-none">
@@ -168,7 +160,7 @@ l.parentNode.insertBefore(s, l);
                             Share
                         </button>
                         ${isAdminUnlocked ? `
-                            <button onclick="deleteApp('${app.fbKey || app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
+                            <button onclick="deleteApp('${app.fbKey \vert{}\vert{} app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
                                 Delete
                             </button>
                         ` : ''}
@@ -180,7 +172,6 @@ l.parentNode.insertBefore(s, l);
 
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
-            // Updated with your permanent domain apklayer.sbs
             let webUrl = "https://apklayer.sbs/#app=" + appId;
             let shareText = `Download ${appName} on ApkLayer!`;
 
@@ -234,12 +225,10 @@ l.parentNode.insertBefore(s, l);
             if (!app) return;
             document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
             
-            // Update Open Graph (WhatsApp, Facebook, Telegram)
             document.getElementById('metaTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('metaDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('metaImage').setAttribute('content', app.logoUrl);
 
-            // Update Twitter Cards
             document.getElementById('twitterTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('twitterDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('twitterImage').setAttribute('content', app.logoUrl);
@@ -255,7 +244,6 @@ l.parentNode.insertBefore(s, l);
                 return;
             }
 
-            // Dynamically update meta tags for social sharing preview
             updateMetaTags(app);
 
             document.getElementById('home-view').classList.add('hidden');
@@ -263,7 +251,6 @@ l.parentNode.insertBefore(s, l);
 
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
-            // Render Screenshots HTML if available
             let screenshotsHtml = '';
             if (app.screenshots && Array.isArray(app.screenshots) && app.screenshots.length > 0) {
                 screenshotsHtml = `
@@ -358,7 +345,7 @@ l.parentNode.insertBefore(s, l);
             if (hash.includes('app=')) {
                 const match = hash.match(/app=([^&]+)/);
                 if (match) {
-                    if (allApps.length > 0) {
+                    if (allApps.length >0) {
                         renderDetail(match[1]);
                     } else {
                         setTimeout(() => renderDetail(match[1]), 500);
@@ -370,17 +357,5 @@ l.parentNode.insertBefore(s, l);
         window.onhashchange = checkRoute;
         initStore();
     </script>
-    <script>
-(function(snpb){
-var d = document,
-    s = d.createElement('script'),
-    l = d.currentScript || d.scripts[d.scripts.length - 1];
-s.settings = snpb || {};
-s.src = "\/\/conventionalresponse.com\/blXZVus.dCGwlo0_YDWscV\/peDm\/9\/uWZTUClCk\/P\/TJc\/0AMcz\/kwwSObTEcStpNfz\/Q_ziOwTXEbwaMhQG";
-s.async = true;
-s.referrerPolicy = 'no-referrer-when-downgrade';
-l.parentNode.insertBefore(s, l);
-})({})
-</script>
 </body>
 </html>
