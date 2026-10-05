@@ -167,7 +167,7 @@
                             Share
                         </button>
                         ${isAdminUnlocked ? `
-                            <button onclick="deleteApp('${app.fbKey || app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
+                            <button onclick="deleteApp('${app.fbKey \vert{}\vert{} app.id}', '${app.appName}')" class="px-3 py-2 bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white rounded-xl text-xs font-bold border border-red-500/30 transition">
                                 Delete
                             </button>
                         ` : ''}
@@ -179,8 +179,7 @@
 
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
-            // Updated with your permanent domain apklayer.sbs
-            let webUrl = "https://apklayer.sbs/#app=" + appId;
+            let webUrl = "https://apklayer.sbs/?app=" + appId;
             let shareText = `Download ${appName} on ApkLayer!`;
 
             if (navigator.share) {
@@ -225,20 +224,17 @@
         }
 
         function openApp(appId) {
-            window.location.hash = `app=${appId}`;
-            renderDetail(appId);
+            window.location.href = `?app=${appId}`;
         }
 
         function updateMetaTags(app) {
             if (!app) return;
             document.getElementById('pageTitle').innerText = `${app.appName} v${app.version || '1.0'} - Download APK | ApkLayer`;
             
-            // Update Open Graph (WhatsApp, Facebook, Telegram)
             document.getElementById('metaTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('metaDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('metaImage').setAttribute('content', app.logoUrl);
 
-            // Update Twitter Cards
             document.getElementById('twitterTitle').setAttribute('content', `${app.appName} - Download on ApkLayer`);
             document.getElementById('twitterDesc').setAttribute('content', app.description || `Download ${app.appName} safely from ApkLayer.`);
             document.getElementById('twitterImage').setAttribute('content', app.logoUrl);
@@ -254,7 +250,6 @@
                 return;
             }
 
-            // Dynamically update meta tags for social sharing preview
             updateMetaTags(app);
 
             document.getElementById('home-view').classList.add('hidden');
@@ -262,7 +257,6 @@
 
             document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
 
-            // Render Screenshots HTML if available
             let screenshotsHtml = '';
             if (app.screenshots && Array.isArray(app.screenshots) && app.screenshots.length > 0) {
                 screenshotsHtml = `
@@ -288,27 +282,27 @@
                     </div>
 
                     ${screenshotsHtml}
-<div id="native-ad-slot-2" class="w-full flex justify-center my-4"></div>
+                    <div id="native-ad-slot-2" class="w-full flex justify-center my-4"></div>
 
                     <button id="downloadBtn" onclick="startDownload('${app.archiveUrl}')" class="w-full py-4 bg-gradient-to-r from-emerald-600 to-amber-600 hover:from-emerald-500 hover:to-amber-500 rounded-2xl font-extrabold text-sm transition shadow-lg shadow-emerald-900/30 text-white cursor-pointer">
                         Download APK
                     </button>
                 </div>
             `;
-const adSlot2 = document.getElementById('native-ad-slot-2');
-if (adSlot2) {
-    adSlot2.innerHTML = '';
-    const s1 = document.createElement('script');
-    s1.async = true;
-    s1.setAttribute('data-cfasync', 'false');
-    s1.src = 'https://pl31396652.profitableratecpmnetwork.com/39b3df06ed53225cbbf280b4c58f9333/invoke.js';
-    
-    const s2 = document.createElement('div');
-    s2.id = 'container-39b3df06ed53225cbbf280b4c58f9333';
-    
-    adSlot2.appendChild(s2);
-    adSlot2.appendChild(s1);
-}
+            const adSlot2 = document.getElementById('native-ad-slot-2');
+            if (adSlot2) {
+                adSlot2.innerHTML = '';
+                const s1 = document.createElement('script');
+                s1.async = true;
+                s1.setAttribute('data-cfasync', 'false');
+                s1.src = 'https://pl31396652.profitableratecpmnetwork.com/39b3df06ed53225cbbf280b4c58f9333/invoke.js';
+                
+                const s2 = document.createElement('div');
+                s2.id = 'container-39b3df06ed53225cbbf280b4c58f9333';
+                
+                adSlot2.appendChild(s2);
+                adSlot2.appendChild(s1);
+            }
 
             let relatedApps = allApps.filter(a => a.id != appId);
             const relatedGrid = document.getElementById('related-apps-grid');
@@ -350,11 +344,7 @@ if (adSlot2) {
         }
 
         function goBack() {
-            window.location.hash = '';
-            resetMetaTags();
-            document.getElementById('detail-view').classList.add('hidden');
-            document.getElementById('home-view').classList.remove('hidden');
-            displayApps(allApps);
+            window.location.href = window.location.pathname;
         }
 
         function resetMetaTags() {
@@ -368,20 +358,17 @@ if (adSlot2) {
         }
 
         function checkRoute() {
-            const hash = window.location.hash;
-            if (hash.includes('app=')) {
-                const match = hash.match(/app=([^&]+)/);
-                if (match) {
-                    if (allApps.length > 0) {
-                        renderDetail(match[1]);
-                    } else {
-                        setTimeout(() => renderDetail(match[1]), 500);
-                    }
+            const params = new URLSearchParams(window.location.search);
+            const appId = params.get('app');
+            if (appId) {
+                if (allApps.length > 0) {
+                    renderDetail(appId);
+                } else {
+                    setTimeout(() => renderDetail(appId), 500);
                 }
             }
         }
 
-        window.onhashchange = checkRoute;
         initStore();
     </script>
 </body>
