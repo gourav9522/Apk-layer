@@ -116,13 +116,13 @@
         });
 
         function promptAdminPassword() {
-            const pass = prompt("Enter Admin Password to manage/delete apps:");
-            if (pass === "9522") {
+            const promptPass = prompt("Enter Admin Password to manage/delete apps:");
+            if (promptPass === "9522") {
                 isAdminUnlocked = true;
                 document.getElementById('adminBadge').classList.remove('hidden');
                 alert("🔓 Admin mode unlocked! You can now delete apps.");
                 displayApps(allApps);
-            } else if (pass !== null) {
+            } else if (promptPass !== null) {
                 alert("❌ Wrong password!");
             }
         }
@@ -179,6 +179,7 @@
 
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
+            // Naye apps ke liye bina # ke query parameter wali link banegi taaki Google index kare
             let webUrl = "https://apklayer.sbs/?app=" + appId;
             let shareText = `Download ${appName} on ApkLayer!`;
 
@@ -361,7 +362,7 @@
             const params = new URLSearchParams(window.location.search);
             let appId = params.get('app');
             
-            // Agar query mein nahi mila toh purana hash (#app=...) check karega taaki purane links bhi chalein
+            // Agar query parameter nahi hai, toh purana hash (#app=...) check karega taaki purane links bhi khul jayein
             if (!appId && window.location.hash.includes('app=')) {
                 const match = window.location.hash.match(/app=([^&]+)/);
                 if (match) appId = match[1];
@@ -376,7 +377,6 @@
             }
         }
 
-        window.onhashchange = checkRoute;
         initStore();
     </script>
 </body>
