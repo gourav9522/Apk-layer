@@ -180,7 +180,7 @@
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
             // Updated with your permanent domain apklayer.sbs
-            let webUrl = "https://apklayer.sbs/#app=" + appId;
+            let webUrl = "https://apklayer.sbs/?app=" + appId;
             let shareText = `Download ${appName} on ApkLayer!`;
 
             if (navigator.share) {
