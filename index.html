@@ -359,7 +359,14 @@
 
         function checkRoute() {
             const params = new URLSearchParams(window.location.search);
-            const appId = params.get('app');
+            let appId = params.get('app');
+            
+            // Agar query mein nahi mila toh purana hash (#app=...) check karega taaki purane links bhi chalein
+            if (!appId && window.location.hash.includes('app=')) {
+                const match = window.location.hash.match(/app=([^&]+)/);
+                if (match) appId = match[1];
+            }
+
             if (appId) {
                 if (allApps.length > 0) {
                     renderDetail(appId);
@@ -369,6 +376,7 @@
             }
         }
 
+        window.onhashchange = checkRoute;
         initStore();
     </script>
 </body>
