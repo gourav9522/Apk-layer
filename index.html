@@ -186,7 +186,6 @@
             let appName = app ? app.appName : "App";
             let slug = createSlug(appName);
             
-            // Generate clean title slug link
             let webUrl = `https://apklayer.sbs/?app=${slug}-${appId}`;
             let shareText = `Download ${appName} on ApkLayer!`;
 
@@ -373,7 +372,6 @@
             let appId = null;
 
             if (appParam) {
-                // Extracts ID if formatted as "pubg-mobile-123456" or just "123456"
                 let parts = appParam.split('-');
                 appId = parts[parts.length - 1];
             }
