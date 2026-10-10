@@ -125,6 +125,11 @@
             }
         }
 
+        function createSlug(name) {
+            if (!name) return "app";
+            return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        }
+
         async function initStore() {
             const loadingText = document.getElementById('loadingText');
             try {
@@ -145,10 +150,6 @@
             checkRoute();
         }
 
-        function createSlug(name) {
-            return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-        }
-
         function displayApps(apps) {
             const grid = document.getElementById('app-grid');
             if(apps.length === 0) {
@@ -157,7 +158,7 @@
             }
             grid.innerHTML = apps.map(app => `
                 <div class="flex items-center justify-between p-4 bg-slate-900 hover:bg-slate-900/80 rounded-2xl border emerald-border transition shadow-md">
-                    <div onclick="openApp('${app.id}', '${app.appName}')" class="flex items-center gap-4 flex-1 cursor-pointer">
+                    <div onclick="openApp('${app.id}')" class="flex items-center gap-4 flex-1 cursor-pointer">
                         <img src="${app.logoUrl}" alt="${app.appName}" class="w-14 h-14 rounded-2xl object-cover bg-slate-950 border emerald-border">
                         <div>
                             <h2 class="text-base font-bold text-slate-100">${app.appName}</h2>
@@ -165,7 +166,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="shareApp('${app.id}', '${app.appName}', event)" class="px-3 py-2 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-xl text-xs font-bold border border-emerald-500/30 transition cursor-pointer">
+                        <button onclick="shareApp('${app.id}', event)" class="px-3 py-2 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-xl text-xs font-bold border border-emerald-500/30 transition cursor-pointer">
                             Share
                         </button>
                         ${isAdminUnlocked ? `
@@ -173,16 +174,20 @@
                                 Delete
                             </button>
                         ` : ''}
-                        <span onclick="openApp('${app.id}', '${app.appName}')" class="px-4 py-2 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-xl text-xs font-bold border border-emerald-500/30 cursor-pointer transition">View</span>
+                        <span onclick="openApp('${app.id}')" class="px-4 py-2 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-xl text-xs font-bold border border-emerald-500/30 cursor-pointer transition">View</span>
                     </div>
                 </div>
             `).join('');
         }
 
-        function shareApp(appId, appName, event) {
+        function shareApp(appId, event) {
             if(event) event.stopPropagation();
+            let app = allApps.find(a => a.id == appId);
+            let appName = app ? app.appName : "App";
             let slug = createSlug(appName);
-            let webUrl = `https://apklayer.sbs/app/${slug}-${appId}`;
+            
+            // Generate clean title slug link
+            let webUrl = `https://apklayer.sbs/?app=${slug}-${appId}`;
             let shareText = `Download ${appName} on ApkLayer!`;
 
             if (navigator.share) {
@@ -226,11 +231,10 @@
             displayApps(filtered);
         }
 
-        function openApp(appId, appName) {
-            let slug = createSlug(appName);
-            let newUrl = `/app/${slug}-${appId}`;
-            window.history.pushState({appId}, "", newUrl);
-            renderDetail(appId);
+        function openApp(appId) {
+            let app = allApps.find(a => a.id == appId);
+            let slug = app ? createSlug(app.appName) : "app";
+            window.location.search = `?app=${slug}-${appId}`;
         }
 
         function updateMetaTags(app) {
@@ -261,7 +265,7 @@
             document.getElementById('home-view').classList.add('hidden');
             document.getElementById('detail-view').classList.remove('hidden');
 
-            document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id, app.appName);
+            document.getElementById('shareDetailBtn').onclick = () => shareApp(app.id);
 
             let screenshotsHtml = '';
             if (app.screenshots && Array.isArray(app.screenshots) && app.screenshots.length > 0) {
@@ -317,7 +321,7 @@
                 relatedGrid.innerHTML = '<p class="text-xs text-slate-500">No other apps available.</p>';
             } else {
                 relatedGrid.innerHTML = relatedApps.slice(0, 4).map(rel => `
-                    <div onclick="openApp('${rel.id}', '${rel.appName}')" class="flex items-center justify-between p-3.5 bg-slate-900 hover:bg-slate-900/80 rounded-2xl border emerald-border cursor-pointer transition shadow-md">
+                    <div onclick="openApp('${rel.id}')" class="flex items-center justify-between p-3.5 bg-slate-900 hover:bg-slate-900/80 rounded-2xl border emerald-border cursor-pointer transition shadow-md">
                         <div class="flex items-center gap-3">
                             <img src="${rel.logoUrl}" class="w-11 h-11 rounded-xl object-cover bg-slate-950 border emerald-border">
                             <div>
@@ -350,11 +354,7 @@
         }
 
         function goBack() {
-            window.history.pushState({}, "", "/");
-            resetMetaTags();
-            document.getElementById('detail-view').classList.add('hidden');
-            document.getElementById('home-view').classList.remove('hidden');
-            displayApps(allApps);
+            window.location.href = "/";
         }
 
         function resetMetaTags() {
@@ -368,23 +368,14 @@
         }
 
         function checkRoute() {
-            const path = window.location.pathname; // e.g. /app/ocean-is-home-survival-island-1791620174214
+            const params = new URLSearchParams(window.location.search);
+            let appParam = params.get('app');
             let appId = null;
 
-            if (path.includes('/app/')) {
-                const parts = path.split('-');
-                appId = parts[parts.length - 1]; // Last part is the ID
-            } else {
-                // Fallback for old query/hash parameters if any old link is opened
-                const params = new URLSearchParams(window.location.search);
-                appId = params.get('app');
-                if (!appId) {
-                    const hash = window.location.hash;
-                    if (hash.includes('app=')) {
-                        const match = hash.match(/app=([^&]+)/);
-                        if (match) appId = match[1];
-                    }
-                }
+            if (appParam) {
+                // Extracts ID if formatted as "pubg-mobile-123456" or just "123456"
+                let parts = appParam.split('-');
+                appId = parts[parts.length - 1];
             }
 
             if (appId) {
@@ -396,7 +387,6 @@
             }
         }
 
-        window.onpopstate = checkRoute;
         initStore();
 
         function openMenuModal() {
