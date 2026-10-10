@@ -124,7 +124,11 @@
                 alert("❌ Wrong password!");
             }
         }
-
+function createSlug(name) {
+    if (!name) return "app";
+    return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+        
         async function initStore() {
             const loadingText = document.getElementById('loadingText');
             try {
@@ -178,7 +182,9 @@
         function shareApp(appId, appName, event) {
             if(event) event.stopPropagation();
             // Updated with your permanent domain apklayer.sbs
-            let webUrl = "https://apklayer.sbs/?app=" + appId;
+            let slug = createSlug(appName);
+let webUrl = "https://apklayer.sbs/?app=" + slug + "-" + appId;
+
             let shareText = `Download ${appName} on ApkLayer!`;
 
             if (navigator.share) {
@@ -367,8 +373,13 @@ if (adSlot2) {
 
                 function checkRoute() {
             const params = new URLSearchParams(window.location.search);
-            let appId = params.get('app');
-            
+            let appParam = params.get('app');
+let appId = null;
+if (appParam) {
+    let parts = appParam.split('-');
+    appId = parts[parts.length - 1];
+}
+                    
             if (!appId) {
                 const hash = window.location.hash;
                 if (hash.includes('app=')) {
