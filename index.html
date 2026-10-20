@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
     <script data-cfasync="false" src="//dvwztnx4ab3fl.cloudfront.net/?tzwvd=1728442"></script>
-    <script class="admoloScript" src="https://cdn.admolo.com/assets/ads/ad.js"></script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -306,13 +305,9 @@ let webUrl = "https://apklayer.sbs/?app=" + slug + "-" + appId;
             `;
 const adSlot2 = document.getElementById('native-ad-slot-2');
 if (adSlot2) {
-    adSlot2.innerHTML = '';
-    const adDiv = document.createElement('div');
-    adDiv.className = 'admoloBanner';
-    adDiv.setAttribute('data-publisher', 'eyJpdiI6IlVHMDRuNnNZZ29FcWk4YU9KUjI5NlE9PSIsInZhbHVlIjoiVTVrWDJNajlRMVhrMmZhZjRtNkNUQT09IiwibWFjIjoiNzBkOGUyNmFkZjA3MDAzZWE3NzE3ODdhZDY0MzIzMjBmY2FiMjIwNGY1MmNiZmFhZmExMGQ0Mjc3ODA4ZmVlNSIsInRhZyI6IiJ9');
-    adDiv.setAttribute('data-adsize', '300x300');
-    adSlot2.appendChild(adDiv);
+    adSlot2.innerHTML = '<script async="async" data-cfasync="false" src="https://bauval.org/21/39b3df06ed53225cbbf280b4c58f9333"><\/script><div id="container-39b3df06ed53225cbbf280b4c58f9333"></div>';
 }
+
 
             let relatedApps = allApps.filter(a => a.id != appId);
             const relatedGrid = document.getElementById('related-apps-grid');
