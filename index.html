@@ -301,10 +301,15 @@ let webUrl = "https://apklayer.sbs/?app=" + slug + "-" + appId;
                     </button>
                 </div>
             `;
-<div class="admoloBanner"
-data-publisher="eyJpdiI6IlVHMDRuNnNZZ29FcWk4YU9KUjI5NlE9PSIsInZhbHVlIjoiVTVrWDJNajlRMVhrMmZhZjRtNkNUQT09IiwibWFjIjoiNzBkOGUyNmFkZjA3MDAzZWE3NzE3ODdhZDY0MzIzMjBmY2FiMjIwNGY1MmNiZmFhZmExMGQ0Mjc3ODA4ZmVlNSIsInRhZyI6IiJ9"
-data-adsize="300x300"></div>
-
+const adSlot2 = document.getElementById('native-ad-slot-2');
+if (adSlot2) {
+    adSlot2.innerHTML = '';
+    const adDiv = document.createElement('div');
+    adDiv.className = 'admoloBanner';
+    adDiv.setAttribute('data-publisher', 'eyJpdiI6IlVHMDRuNnNZZ29FcWk4YU9KUjI5NlE9PSIsInZhbHVlIjoiVTVrWDJNajlRMVhrMmZhZjRtNkNUQT09IiwibWFjIjoiNzBkOGUyNmFkZjA3MDAzZWE3NzE3ODdhZDY0MzIzMjBmY2FiMjIwNGY1MmNiZmFhZmExMGQ0Mjc3ODA4ZmVlNSIsInRhZyI6IiJ9');
+    adDiv.setAttribute('data-adsize', '300x300');
+    adSlot2.appendChild(adDiv);
+}
 
             let relatedApps = allApps.filter(a => a.id != appId);
             const relatedGrid = document.getElementById('related-apps-grid');
